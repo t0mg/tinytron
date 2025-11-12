@@ -6,6 +6,7 @@
 #include <AsyncTCP.h>
 #include <DNSServer.h>
 #include "Prefs.h"
+#include "Battery.h"
 
 // Embedded files
 extern const uint8_t index_html_start[] asm("_binary_src_www_index_html_start");
@@ -56,7 +57,7 @@ private:
 class WifiManager
 {
 public:
-  WifiManager(AsyncWebServer *server, Prefs *prefs);
+  WifiManager(AsyncWebServer *server, Prefs *prefs, Battery *battery);
   void begin();
   bool isConnected();
   bool isAPMode();
@@ -68,6 +69,7 @@ private:
   static const char *PARAM_INPUT_2;
 
   Prefs *prefs;
+  Battery *_battery;
 
   AsyncWebServer *server;
   IPAddress localIP;

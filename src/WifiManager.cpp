@@ -6,8 +6,8 @@
 const char *WifiManager::PARAM_INPUT_1 = "ssid";
 const char *WifiManager::PARAM_INPUT_2 = "pass";
 
-WifiManager::WifiManager(AsyncWebServer *server, Prefs *prefs)
-    : server(server), prefs(prefs), subnet(255, 255, 0, 0), previousMillis(0) {}
+WifiManager::WifiManager(AsyncWebServer *server, Prefs *prefs, Battery *battery)
+    : server(server), prefs(prefs), _battery(battery), subnet(255, 255, 0, 0), previousMillis(0) {}
 
 void WifiManager::begin()
 {
@@ -103,6 +103,12 @@ void WifiManager::setupServer()
     {
       request->send(400, "text/plain", "Missing brightness parameter");
     } });
+
+  server->on("/voltage", HTTP_GET, [this](AsyncWebServerRequest *request)
+             {
+    float voltage = _battery->getVoltage();
+    String jsonResponse = "{\"voltage\": " + String(voltage) + "}";
+    request->send(200, "application/json", jsonResponse); });
 
   setupWifiPostHandler();
 }

@@ -9,6 +9,7 @@
 #include <Wire.h>
 #include "Prefs.h"
 #include "WifiManager.h"
+#include "Battery.h"
 #include <ESPAsyncWebServer.h>
 
 #ifndef USE_DMA
@@ -21,7 +22,8 @@ Display display;
 Button button(SYS_OUT, SYS_EN);
 Prefs prefs;
 AsyncWebServer server(80);
-WifiManager wifiManager(&server, &prefs);
+Battery battery(BATTERY_VOLTAGE_PIN, 3.3, 200000.0, 100000.0);
+WifiManager wifiManager(&server, &prefs, &battery);
 bool wifiManagerActive = false;
 
 void setup()
@@ -30,6 +32,7 @@ void setup()
   Serial.begin(115200);
   delay(500); // Wait for serial to initialize
 
+  battery.begin();
   prefs.begin();
   prefs.onBrightnessChanged([](int brightness)
                             { display.setBrightness(brightness); });

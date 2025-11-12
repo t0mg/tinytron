@@ -4,6 +4,7 @@ const startButton = document.getElementById('startButton');
 const stopButton = document.getElementById('stopButton');
 const previewImage = document.getElementById('previewImage');
 const brightnessSlider = document.getElementById('brightness');
+const batteryVoltageDisplay = document.getElementById('batteryVoltageDisplay');
 
 // fetch the initial brightness and set the slider
 fetch('/brightness')
@@ -22,6 +23,25 @@ brightnessSlider.addEventListener('change', () => {
     body: `brightness=${brightnessSlider.value}`
   });
 });
+
+// Function to fetch and display battery voltage
+function fetchBatteryVoltage() {
+  fetch('/voltage')
+    .then(response => response.json())
+    .then(data => {
+      if (data && data.voltage !== undefined) {
+        batteryVoltageDisplay.textContent = data.voltage.toFixed(2);
+      }
+    })
+    .catch(error => console.error('Error fetching battery voltage:', error));
+}
+
+// Fetch battery voltage on page load
+fetchBatteryVoltage();
+
+// Refresh battery voltage every minute
+setInterval(fetchBatteryVoltage, 60000);
+
 
 // New UI elements
 const scaleFactorSelect = document.getElementById('scaleFactor');
