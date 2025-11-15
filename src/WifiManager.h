@@ -7,6 +7,7 @@
 #include <DNSServer.h>
 #include "Prefs.h"
 #include "Battery.h"
+#include <Update.h>
 
 // Embedded files
 extern const uint8_t index_html_start[] asm("_binary_src_www_index_html_start");

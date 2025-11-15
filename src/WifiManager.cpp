@@ -113,6 +113,33 @@ void WifiManager::setupCommonRoutes()
         ESP.restart();
     } });
   server->addHandler(handler);
+
+  // OTA update endpoint
+  server->on("/update", HTTP_POST, [](AsyncWebServerRequest *request) {
+    AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", (Update.hasError()) ? "FAIL" : "OK");
+    response->addHeader("Connection", "close");
+    request->send(response);
+    ESP.restart();
+  }, [](AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final) {
+    if (index == 0) {
+      Serial.printf("Update Start: %s\n", filename.c_str());
+      if (!Update.begin(UPDATE_SIZE_UNKNOWN)) {
+        Update.printError(Serial);
+      }
+    }
+    if (!Update.hasError()) {
+      if (Update.write(data, len) != len) {
+        Update.printError(Serial);
+      }
+    }
+    if (final) {
+      if (Update.end(true)) {
+        Serial.printf("Update Success: %uB\n", index + len);
+      } else {
+        Update.printError(Serial);
+      }
+    }
+  });
 }
 
 void WifiManager::setupServer()
