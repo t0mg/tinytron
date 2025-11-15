@@ -235,9 +235,6 @@ void VideoPlayer::framePlayerTask()
     if (millis() - mChannelVisible < 2000) {
       mDisplay.drawChannel(mVideoSource->getChannelNumber());
     }
-    #if CORE_DEBUG_LEVEL > 0
-    mDisplay.drawFPS(frameTimes.size() / 5);
-    #endif
     mDisplay.endWrite();
   }
   // clean up

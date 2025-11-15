@@ -2,6 +2,9 @@
 #include <ArduinoJson.h>
 #include "AsyncJson.h"
 
+#define STRINGIFY(x) #x
+#define TOSTRING(x) STRINGIFY(x)
+
 // Simple WiFi manager for ESP32 using AsyncWebServer and Preferences
 // Inspired by https://randomnerdtutorials.com/esp32-wi-fi-manager-asyncwebserver/
 
@@ -84,7 +87,7 @@ void WifiManager::setupCommonRoutes()
     json["brightness"] = prefs->getBrightness();
     json["osdLevel"] = prefs->getOsdLevel();
     json["apMode"] = isAPMode();
-    json["version"] = APP_VERSION;
+    json["version"] = TOSTRING(APP_VERSION);
     json["build"] = APP_BUILD_NUMBER;
     String response;
     serializeJson(json, response);
