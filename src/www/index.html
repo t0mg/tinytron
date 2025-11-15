@@ -26,6 +26,7 @@
       color: var(--main-color);
       display: flex;
       font-family: 'VCR OSD Mono', 'Courier New', Courier, monospace;
+      justify-content: center;
       margin: 0;
       min-height: 100vh;
       text-shadow: 0 0 7px var(--shadow);
@@ -50,9 +51,10 @@
       border: 2px solid var(--main-color);
       border-radius: 60px;
       box-shadow: 0 0 15px var(--main-color);
-      margin: 0 auto;
+      margin: 20px 0;
       padding: 20px;
-      width: 80%;
+      width: calc(100vw - 90px);
+      max-width: 880px;
     }
 
     h1,
@@ -87,6 +89,7 @@
 
     .tabs .tabcontent {
       border-top: none;
+      box-sizing: border-box;
       display: none;
       order: 99;
       /* Move content to the end of the flex container */
@@ -167,13 +170,19 @@
       align-items: center;
       gap: 20px;
       margin-top: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
     }
 
-    video, #previewImage {
-      height: 240px;
-      width: 288px;
+    video,
+    #previewImage {
+      border: 1px solid var(--main-color);
       border-radius: 20px;
+      box-sizing: border-box;
+      height: 240px;    
       position: relative;
+      width: 288px;
       z-index: 100;
     }
 
@@ -187,6 +196,11 @@
 
     #previewImage[src] {
       display: block;
+    }
+
+    .stats {
+      flex: 1;
+      text-align: center;
     }
   </style>
 </head>
@@ -220,7 +234,7 @@
           </select>
 
           <div class="preview">
-            <div>
+            <div class="stats">
               <span>FPS: <span id="fpsDisplay">-</span></span><br>
               <span>Frame Size: <span id="frameSizeDisplay">-</span> bytes</span><br>
             </div>

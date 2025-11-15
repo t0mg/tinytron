@@ -232,8 +232,8 @@ window.onload = async () => {
     setInterval(fetchBatteryVoltage, 60000);
   }
   if (!success || apMode) {
-    // streamingTabLabel.style.display = 'none';
-    // settingsTabRadio.checked = true;
+    streamingTabLabel.style.display = 'none';
+    settingsTabRadio.checked = true;
   } else {
     connectWebSocket();
   }
