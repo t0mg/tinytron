@@ -227,7 +227,7 @@
       }
 
       .tabs> label {
-        width: 33.33%;
+        width: calc(33.33% - 32px);
       }
 
     }
@@ -302,6 +302,7 @@
       <input type="radio" name="tabs" id="tab-firmware">
       <label for="tab-firmware">Firmware</label>
       <div class="tabcontent">
+        <p>Version: <span id="firmwareVersion">-</span> (<span id="firmwareBuild">-</span>)</p>
         <form id="updateForm">
           <label for="firmwareFile">Select Firmware File (.bin)</label>
           <input type="file" id="firmwareFile" name="update" accept=".bin" required>

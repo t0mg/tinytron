@@ -232,7 +232,10 @@ void VideoPlayer::framePlayerTask()
       mJpeg.decode(0, 0, 0);
       mJpeg.close();
     }
-    drawOSD(frameTimes.size() / 5);
+    // show channel indicator 
+    if (millis() - mChannelVisible < 2000) {
+      drawOSD(frameTimes.size() / 5);
+    }
     mDisplay.endWrite();
   }
   // clean up

@@ -21,6 +21,8 @@ const updateForm = document.getElementById('updateForm');
 const updateButton = document.getElementById('updateButton');
 const firmwareFile = document.getElementById('firmwareFile');
 const updateProgress = document.getElementById('updateProgress');
+const firmwareVersion = document.getElementById('firmwareVersion');
+const firmwareBuild = document.getElementById('firmwareBuild');
 
 let ws;
 let videoFrameId;
@@ -39,6 +41,12 @@ async function fetchSettings() {
       brightnessSlider.value = settings.brightness;
       osdLevelSelect.value = settings.osdLevel;
       apMode = settings.apMode;
+      if (settings.version) {
+        firmwareVersion.textContent = settings.version;
+      }
+      if (settings.build) {
+        firmwareBuild.textContent = settings.build;
+      }
       success = true;
     })
     .catch(error => console.warn('Error fetching settings:', error));
