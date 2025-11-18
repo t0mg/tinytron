@@ -13,13 +13,19 @@ Display::Display(Prefs *prefs) : tft(new TFT_eSPI()), _prefs(prefs)
 
   // First, initialize the TFT itself and set the rotation
   tft->init();
+#ifdef CHEAP_YELLOW_DISPLAY
+  tft->setRotation(1);
+#else
   tft->setRotation(3);
+#endif
 
+#ifdef BOARD_HAS_PSRAM
   // Now create the sprite with the correct, rotated dimensions
   frameSprite = new TFT_eSprite(tft);
   frameSprite->createSprite(tft->width(), tft->height());
   frameSprite->setTextFont(2);
   frameSprite->setTextSize(2);
+#endif
 
 // setup the backlight
 #ifdef TFT_BL
@@ -71,22 +77,34 @@ void Display::drawPixels(int x, int y, int width, int height, uint16_t *pixels)
 // new function to draw to our framebuffer sprite
 void Display::drawPixelsToSprite(int x, int y, int width, int height, uint16_t *pixels)
 {
+#ifdef BOARD_HAS_PSRAM
   frameSprite->pushImage(x, y, width, height, pixels);
+#else
+  drawPixels(x, y, width, height, pixels);
+#endif
 }
 
 // new function to push the framebuffer to the screen
 void Display::flushSprite()
 {
+#ifdef BOARD_HAS_PSRAM
   xSemaphoreTakeRecursive(tft_mutex, portMAX_DELAY);
   frameSprite->pushSprite(0, 0);
   xSemaphoreGiveRecursive(tft_mutex);
+#endif
 }
 
 void Display::fillSprite(uint16_t color)
 {
+#ifdef BOARD_HAS_PSRAM
   xSemaphoreTakeRecursive(tft_mutex, portMAX_DELAY);
   frameSprite->fillSprite(color);
   xSemaphoreGiveRecursive(tft_mutex);
+#else
+  xSemaphoreTakeRecursive(tft_mutex, portMAX_DELAY);
+  tft->fillScreen(color);
+  xSemaphoreGiveRecursive(tft_mutex);
+#endif
 }
 
 int Display::width()
@@ -107,9 +125,15 @@ int Display::height()
 
 void Display::fillScreen(uint16_t color)
 {
+#ifdef BOARD_HAS_PSRAM
   xSemaphoreTakeRecursive(tft_mutex, portMAX_DELAY);
   frameSprite->fillScreen(color);
   xSemaphoreGiveRecursive(tft_mutex);
+#else
+  xSemaphoreTakeRecursive(tft_mutex, portMAX_DELAY);
+  tft->fillScreen(color);
+  xSemaphoreGiveRecursive(tft_mutex);
+#endif
 }
 
 void Display::drawOSD(const char *text, OSDPosition position, OSDLevel level)
@@ -118,6 +142,7 @@ void Display::drawOSD(const char *text, OSDPosition position, OSDLevel level)
   {
     return;
   }
+#ifdef BOARD_HAS_PSRAM
   // draw OSD text into the sprite, with a black background for readability
   frameSprite->setTextColor(TFT_ORANGE, TFT_BLACK);
 
@@ -151,6 +176,43 @@ void Display::drawOSD(const char *text, OSDPosition position, OSDLevel level)
   }
   frameSprite->setCursor(x, y);
   frameSprite->println(text);
+#else
+  // no sprite, draw directly to the screen
+  xSemaphoreTakeRecursive(tft_mutex, portMAX_DELAY);
+  tft->setTextColor(TFT_ORANGE, TFT_BLACK);
+
+  int textWidth = tft->textWidth(text);
+  int textHeight = tft->fontHeight();
+  int x = 0;
+  int y = 0;
+
+  switch (position)
+  {
+  case TOP_LEFT:
+    x = 20;
+    y = 20;
+    break;
+  case TOP_RIGHT:
+    x = width() - textWidth - 20;
+    y = 20;
+    break;
+  case BOTTOM_LEFT:
+    x = 20;
+    y = height() - textHeight - 20;
+    break;
+  case BOTTOM_RIGHT:
+    x = width() - textWidth - 20;
+    y = height() - textHeight - 20;
+    break;
+  case CENTER:
+    x = (width() - textWidth) / 2;
+    y = (height() - textHeight) / 2;
+    break;
+  }
+  tft->setCursor(x, y);
+  tft->println(text);
+  xSemaphoreGiveRecursive(tft_mutex);
+#endif
 }
 
 
