@@ -14,7 +14,7 @@ Display::Display(Prefs *prefs) : tft(new TFT_eSPI()), _prefs(prefs)
   // First, initialize the TFT itself and set the rotation
   tft->init();
 #ifdef CHEAP_YELLOW_DISPLAY
-  tft->setRotation(1);
+  tft->setRotation(2);
 #else
   tft->setRotation(3);
 #endif
