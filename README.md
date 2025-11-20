@@ -87,11 +87,13 @@ Then wrap a bit of electrical tape around the male pins in order to create a mak
 
 *Coming soon.*
 
-## Building and flashing
+## Flashing the firmware
+
+<iframe style="border:none;width:100%;height:400px;" src="https://t0mg.github.io/esp32-minitv/flash.html"></iframe>
 
 This project is built with [PlatformIO](https://platformio.org/). You can use the PlatformIO extension for VSCode or the command line interface.
 
-To build the project and flash it to the device, connect the ESP32-S3 board via USB and run:
+To build the project locally and flash it to the device, connect the ESP32-S3 board via USB and run:
 
 ```bash
 platformio run --target upload
@@ -99,7 +101,11 @@ platformio run --target upload
 
 ### Over-the-air updates
 
-Once the initial firmware is flashed, you can perform subsequent updates over the air. Build the firmware binary:
+Once the initial firmware is flashed, you can perform subsequent updates over the air. 
+
+You can find a copy of the latest OTA firmware [here](https://t0mg.github.io/esp32-minitv/firmware/firmware.bin) or you can build it yourself as explained below.
+
+#### Build the binary
 
 ```bash
 platformio run
