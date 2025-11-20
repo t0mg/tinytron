@@ -29,5 +29,11 @@ jobs:
       - name: Upload Firmware Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: firmware
+          name: firmware-factory
+          path: .pio/build/esp32-s3-devkitc-1/firmware-factory.bin
+
+      - name: Upload OTA Firmware Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware-ota
           path: .pio/build/esp32-s3-devkitc-1/firmware.bin

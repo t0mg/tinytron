@@ -8,12 +8,18 @@
             text-align: center;
             padding-top: 50px;
         }
+        .ota-link {
+            margin-top: 25px;
+        }
     </style>
 </head>
 <body>
     <h1>ESP32 Web Flasher</h1>
     <p>Flash the latest firmware to your device directly from your browser.</p>
     <esp-web-install-button manifest="firmware/manifest.json"></esp-web-install-button>
+    <div class="ota-link">
+        <p>Or, <a href="firmware/firmware-ota.bin" download>download the firmware.bin</a> for OTA updates.</p>
+    </div>
     <script type="module" src="https://unpkg.com/esp-web-tools@10.1.1/dist/web/install-button.js?module"></script>
 </body>
 </html>

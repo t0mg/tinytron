@@ -22,10 +22,17 @@ jobs:
       - name: ⬇️ Checkout Repository
         uses: actions/checkout@v4
 
-      - name: ⬇️ Download Firmware Artifact
+      - name: ⬇️ Download Factory Firmware Artifact
         uses: actions/download-artifact@v4
         with:
-          name: firmware
+          name: firmware-factory
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
+
+      - name: ⬇️ Download OTA Firmware Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: firmware-ota
           github-token: ${{ secrets.GITHUB_TOKEN }}
           run-id: ${{ github.event.workflow_run.id }}
 
@@ -38,7 +45,7 @@ jobs:
         run: |
           # Change directory to docs
           cd docs
-          
+
           # 1. Install dependencies (ffmpeg-wasm + marked)
           npm install
 
@@ -50,12 +57,14 @@ jobs:
 
           # 3. Create firmware folder and copy files
           mkdir -p dist/firmware
-          cp ../firmware.bin dist/firmware/
+          # Note: download-artifact creates a directory named after the artifact
+          cp ../firmware-factory/firmware-factory.bin dist/firmware/firmware.bin
+          cp ../firmware-ota/firmware.bin dist/firmware/firmware-ota.bin
           cp firmware/manifest.json dist/firmware/
 
           # 4. Compile README.md into dist/index.html
           npm run md-to-html
-          
+
           # 5. Copy STL files and images
           cp -r ../stl dist/stl
 
@@ -66,7 +75,7 @@ jobs:
           cp node_modules/@ffmpeg/util/dist/esm/* dist/ffmpeg-util/
 
       - name: 📤 Upload Pages Artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: 'docs/dist'
 
