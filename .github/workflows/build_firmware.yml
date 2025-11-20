@@ -26,7 +26,7 @@ jobs:
       - name: Build Firmware
         run: pio run -e esp32-s3-devkitc-1
 
-      - name: Upload Factory Firmware Artifact
+      - name: Upload Firmware Artifact
         uses: actions/upload-artifact@v4
         with:
           name: firmware-factory
