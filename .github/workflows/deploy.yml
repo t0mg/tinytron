@@ -52,7 +52,6 @@ jobs:
           # 2. Prepare the distribution folder
           mkdir -p dist
           cp transcode.html dist/
-          cp flash.html dist/
           cp *.js dist/
 
           # 3. Create firmware folder and copy files

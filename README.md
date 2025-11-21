@@ -18,7 +18,7 @@ One of this project's goals is to keep the BOM as short as possible. Only 3 part
 | -- | -- | -- |
 | Waveshare ESP32-S3-LCD-1.69 | This is the **non touch version**. The touch version has thicker glass and a different footprint. | [Amazon.fr](https://www.amazon.fr/dp/B0D9PTZ5DY), [Aliexpress](https://fr.aliexpress.com/item/1005009927444668.html) |
 | Micro SD card reader breakout board | The case was modeled after this exact board.<br><br>Dimensions: 18x18x20mm | [Amazon.fr](https://www.amazon.fr/dp/B0DRXBF5RW) |
-| 400 mAH LiPo battery | **Important:** the default connector is PH2.0 which isn't compatible with the Waveshare dev board. I spliced a [connector](https://www.amazon.fr/dp/B09TDCLZGB) but you can custom order the correct one (JST1.25mm) from the battery seller.<br><br>Technically optional it is possible to power the device via USB C connector.<br><br>Dimensions: 6x25x30mm | [Aliexpress](https://fr.aliexpress.com/item/1005007103616809.html) |
+| 400 mAH 3.7v LiPo battery | **Important:** the default connector is PH2.0 which isn't compatible with the Waveshare dev board. I spliced a [connector](https://www.amazon.fr/dp/B09TDCLZGB) but you can custom order the correct one (JST1.25mm) from the battery seller.<br><br>Technically optional it is possible to power the device via USB C connector.<br><br>Dimensions: 6x25x30mm | [Aliexpress](https://fr.aliexpress.com/item/1005007103616809.html) |
 | Micro SD card | FAT32 formatted. Also technically optional since the project can also stream video over local network. | |
 
 ### 3D printed case
@@ -91,14 +91,14 @@ Then wrap a bit of electrical tape around the male pins in order to create a mak
 
 ### Web flasher
 
-You can the latest build directly from this page: simple connect your ESP32 to this computer over USB C, click Connect, and follow the instructions.
-
-<esp-web-install-button manifest="firmware/manifest.json">
-</esp-web-install-button>
+You can the latest build directly from this page: simply connect your ESP32 to this computer over USB C, click the Connect button, and follow the instructions.
 
 <p class="mdOnly">Please visit the <a href="https://t0mg.github.io/esp32-minitv/#web-flasher">website</a> version of this documentation to see the Web Flasher button.</p>
 
-**Note:** this is a "factory firmware", flashing it will erase the memory and any previous settings stored on your device. To avoid losing your preferences see the other options below.
+<p><esp-web-install-button manifest="firmware/manifest.json">
+</esp-web-install-button></p>
+
+**Note:** this is a "factory firmware", flashing it will erase the memory and any previous settings (WiFi etc.) that might be stored on your device. To update the firmware to a new version without losing your data, prefer the other methods below.
 
 ### Building locally
 
@@ -112,9 +112,9 @@ platformio run --target upload
 
 ### Over-the-air updates
 
-Once the initial firmware is flashed, you can perform subsequent updates over the air. 
+Once the initial firmware is flashed, you can perform subsequent updates over the air. Connect to the device over WiFi, go to the Firmware tab, select your ota firmware file and click "Upload Firmware".
 
-You can find a copy of the latest OTA firmware [here](https://t0mg.github.io/esp32-minitv/firmware/firmware-ota.bin) or you can build it yourself as explained below.
+You can find a build of the latest OTA firmware [here](https://t0mg.github.io/esp32-minitv/firmware/firmware-ota.bin), or you can build it yourself as explained below.
 
 #### Build the binary
 
