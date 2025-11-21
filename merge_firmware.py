@@ -50,7 +50,7 @@ def merge_bin(source, target, env):
         "--chip", chip,
         "merge_bin",
         "--output", f'"{merged_bin_path}"',
-        "--flash_mode", flash_mode,
+        "--flash_mode", "dout", # flash_mode,
         "--flash_freq", flash_freq,
         "--flash_size", flash_size,
     ] + [item for sublist in flash_images for item in sublist]
