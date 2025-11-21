@@ -58,8 +58,8 @@ jobs:
           # 3. Create firmware folder and copy files
           mkdir -p dist/firmware
           # Note: download-artifact creates a directory named after the artifact
-          cp ../firmware-factory/firmware-factory.bin dist/firmware/firmware.bin
-          cp ../firmware-ota/firmware.bin dist/firmware/firmware-ota.bin
+          cp ../firmware-factory.bin dist/firmware/firmware.bin
+          cp ../firmware.bin dist/firmware/firmware-ota.bin
           cp firmware/manifest.json dist/firmware/
 
           # 4. Compile README.md into dist/index.html

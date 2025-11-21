@@ -103,7 +103,7 @@ platformio run --target upload
 
 Once the initial firmware is flashed, you can perform subsequent updates over the air. 
 
-You can find a copy of the latest OTA firmware [here](https://t0mg.github.io/esp32-minitv/firmware/firmware.bin) or you can build it yourself as explained below.
+You can find a copy of the latest OTA firmware [here](https://t0mg.github.io/esp32-minitv/firmware/firmware-ota.bin) or you can build it yourself as explained below.
 
 #### Build the binary
 
