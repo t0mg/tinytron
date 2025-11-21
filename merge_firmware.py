@@ -38,19 +38,22 @@ def merge_bin(source, target, env):
     app_path = env.subst(target[0].get_abspath())
     flash_images.append((app_offset, app_path))
 
+    esptool_path = os.path.join(
+        env.PioPlatform().get_package_dir("tool-esptoolpy"), "esptool.py"
+    )
+
     # Define the command arguments for esptool.py
-    # Using env.subst to let PlatformIO expand variables like $PYTHONEXE and $OBJCOPY
-    command = env.subst([
-        '"$PYTHONEXE"',
-        '"$OBJCOPY"',
+    # Using env.subst to let PlatformIO expand variables like $PYTHONEXE
+    command = [
+        env.subst('"$PYTHONEXE"'),
+        f'"{esptool_path}"',
         "--chip", chip,
         "merge_bin",
-        "--output", '"' + merged_bin_path + '"',
+        "--output", f'"{merged_bin_path}"',
         "--flash_mode", flash_mode,
         "--flash_freq", flash_freq,
         "--flash_size", flash_size,
-        *[item for sublist in flash_images for item in sublist]
-    ])
+    ] + [item for sublist in flash_images for item in sublist]
 
     print("Merging binaries with command:")
     print(" ".join(command))
