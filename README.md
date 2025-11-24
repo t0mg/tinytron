@@ -42,23 +42,24 @@ One of this project's goals is to keep the BOM as short as possible. Only 3 part
 
 ### 3D printed case
 
-The case is made of 4 parts: front, back, bezel and button. Glue is required to fix the bezel on the front part, the rest of the assembly snap fits (with pretty tight tolerances) and requires no tools. 
+The case design is inspired by late 90's TV/VCR combos like the Sony KV-14V6D. It was made with OnShape and has 4 parts: front, back, bezel and button. Glue is required to stick the bezel to the front part, the rest of the assembly snap fits (with pretty tight tolerances). Printing the parts separately allows for interesting color combinations.
 
-![Assembled parts](assets/cad.png)
-![Exploded case](assets/exploded.png)
+<p class="flex"><img src="assets/cad.png" title="Assembled case"><img src="assets/exploded.png" title=">Exploded case"></p>
 
 #### Printing instructions
 
 <a href="assets/Tinytron.zip" download>Download the STL files</a>
 
-The case was only tested with Prusa MK4S and PLA. It prints with 0.28mm layers in about 30 minutes and 16 grams of material. I tried my best to limit the need for supports but paint-on supports are recommended in select spots for best results.
+The case was only tested with Prusa MK4S and PLA. It prints with 0.28mm layers in about 30 minutes and 16 grams of material. I tried my best to limit the need for supports but paint-on supports (pictured in green in the screenshots below) are recommended in select spots for best results.
 
-| Part | Face on print bed | Paint on support |
+| Part | Face on print bed | Paint-on support |
 | --| --| -- |
 | Front | Front face | Inside of USB C slot |
 | Back | Vent side | Around the curved edge on the print bed |
 | Bezel | Flat side | None |
 | Button | Top side | None |
+
+<p class="flex"><img src="assets/slicer-top.png" title="Parts in PrusaSlicer, top view"><img src="assets/slicer-bottom.png" title="Parts in PrusaSlicer, bottom view"></p>
 
 ## 🪛 Assembly instructions
 
@@ -180,7 +181,7 @@ For much faster conversion, the `ffmpeg` command line tool is recommended. This 
 
 ```sh
 ffmpeg -y -i input.mp4 -an -c:v mjpeg -q:v 10 \
--vf "scale=-1:240:flags=lanczos,crop=288:240:(in_w-288)/2:0,fps=min(25, original_fps)" \
+-vf "scale=-1:240:flags=lanczos,crop=288:240:(in_w-288)/2:0,fps=25" \
 out.avi
 ```
 
@@ -196,7 +197,7 @@ In case you arent ffmpeg fluent, here's a breakdown of what this does:
 | `-vf "..."` | Video Filter Chain: |
 | `scale=-1:240:flags=lanczos` | Scale to 240px height, auto-width, using Lanczos algorithm. |
 | `crop=288:240:(in_w-288)/2:0` | Crop to 288x240, horizontally centered. It's 8 pixels wider than the display, but the JPEG decoding library performs faster with multiples of 16. |
-| `fps=min(25, original_fps)` | Set max FPS to 25, preserving original if lower. |
+| `fps=25` | Cap FPS to 25. |
 | `out.avi` | Output file name and container. | 
 
 ## 📖 Usage
