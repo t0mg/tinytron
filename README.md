@@ -2,21 +2,21 @@
 
 ## 📋 Overview
 
-This project is (yet another) an ESP32 powered video player with 1.69 inch display designed specifically around the [ESP32-S3-LCD-1.69 from Waveshare](https://www.waveshare.com/wiki/ESP32-S3-LCD-1.69). 
+Tinytron is an ESP32 powered video player with a 1.69 inch display, designed specifically around the [ESP32-S3-LCD-1.69 from Waveshare](https://www.waveshare.com/wiki/ESP32-S3-LCD-1.69). 
 
 It can play MJPEG AVI files from an SD card, or stream video content from a computer over WiFi. It features a simple web interface for configuration and can be controlled with a single physical button.
 
 ### Project goals
 
-Tinytron was designed to be straightforward to make:
+There are plenty of great ESP32 TV projects around ([credits](#-credits-and-references) name a few). Tinytron is my attempt at building on their shoulders to make one that's polished yet very easy to build:
 
 - Limited parts: only the dev board, SD card reader and battery, for a total cost of 30€ or less.
 - Minimal soldering: only a 6 pin header to solder.
 - Custom case: the 4 elements of the case print in 30 minutes on a Prusa MK4S.
-- Quick assembly: takes about 5 minutes.
+- Quick assembly: snap fits together, takes about 5 minutes.
 - No software to install: both flashing the firmware and converting video files can be done directly from this web page.
 
-Note: given these goals I chose not to support audio playback in this project.
+Note: given these goals, I chose not to support audio playback in this project.
 
 ### Additional features
 
