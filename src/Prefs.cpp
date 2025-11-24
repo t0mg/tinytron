@@ -5,6 +5,7 @@ const char *Prefs::PREF_SSID = "ssid";
 const char *Prefs::PREF_PASS = "pass";
 const char *Prefs::PREF_BRIGHTNESS = "brightness";
 const char *Prefs::PREF_OSD_LEVEL = "osd_level";
+const char *Prefs::PREF_TIMER_MINUTES = "timer_minutes";
 
 Prefs::Prefs() {}
 
@@ -68,6 +69,25 @@ OSDLevel Prefs::getOsdLevel()
 void Prefs::setOsdLevel(int level)
 {
   writeIntPreference(PREF_OSD_LEVEL, (int)level);
+}
+
+int Prefs::getTimerMinutes()
+{
+  return readIntPreference(PREF_TIMER_MINUTES, 0); // Default to 0 (disabled)
+}
+
+void Prefs::setTimerMinutes(int minutes)
+{
+  writeIntPreference(PREF_TIMER_MINUTES, minutes);
+  if (timer_minutes_changed_callback)
+  {
+    timer_minutes_changed_callback(minutes);
+  }
+}
+
+void Prefs::onTimerMinutesChanged(std::function<void(int)> callback)
+{
+  timer_minutes_changed_callback = callback;
 }
 
 String Prefs::readStringPreference(const char *key, const String &defaultValue)

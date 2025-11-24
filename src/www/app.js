@@ -14,6 +14,8 @@ const ssidInput = document.getElementById('ssid');
 const passInput = document.getElementById('pass');
 const brightnessSlider = document.getElementById('brightness');
 const osdLevelSelect = document.getElementById('osdLevel');
+const timerMinutesSlider = document.getElementById('timerMinutes');
+const timerMinutesDisplay = document.getElementById('timerMinutesDisplay');
 const streamingTabLabel = document.getElementById('streamingTabLabel');
 const settingsTabRadio = document.getElementById('tab-settings');
 const splashscreen = document.getElementById('splashscreen');
@@ -40,6 +42,8 @@ async function fetchSettings() {
       ssidInput.value = settings.ssid;
       brightnessSlider.value = settings.brightness;
       osdLevelSelect.value = settings.osdLevel;
+      timerMinutesSlider.value = settings.timerMinutes;
+      updateTimerDisplay(settings.timerMinutes);
       apMode = settings.apMode;
       if (settings.version) {
         firmwareVersion.textContent = settings.version;
@@ -60,7 +64,8 @@ settingsForm.addEventListener('submit', (event) => {
     ssid: ssidInput.value,
     pass: passInput.value,
     brightness: parseInt(brightnessSlider.value),
-    osdLevel: parseInt(osdLevelSelect.value)
+    osdLevel: parseInt(osdLevelSelect.value),
+    timerMinutes: parseInt(timerMinutesSlider.value)
   };
 
   fetch('/settings', {
@@ -308,6 +313,18 @@ scalingModeSelect.onchange = (e) => {
       break;
   }
 }
+
+function updateTimerDisplay(minutes) {
+  if (minutes == 0) {
+    timerMinutesDisplay.textContent = 'Off';
+  } else {
+    timerMinutesDisplay.textContent = `${minutes} minutes`;
+  }
+}
+
+timerMinutesSlider.addEventListener('input', (event) => {
+  updateTimerDisplay(event.target.value);
+});
 
 // Initial setup
 window.onload = async () => {

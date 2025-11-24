@@ -236,6 +236,7 @@ The web interface allows you to:
 
 - Configure WiFi settings.
 - Adjust screen brightness and On-Screen Display (OSD) level.
+- Set an auto-shutdown timer.
 - View battery status.
 - Stream local video files from your computer to the device.
 - Perform [Over-the-Air (OTA) firmware updates](#over-the-air-updates).

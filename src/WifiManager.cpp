@@ -86,6 +86,7 @@ void WifiManager::setupCommonRoutes()
     json["ssid"] = prefs->getSsid();
     json["brightness"] = prefs->getBrightness();
     json["osdLevel"] = prefs->getOsdLevel();
+    json["timerMinutes"] = prefs->getTimerMinutes();
     json["apMode"] = isAPMode();
     json["version"] = TOSTRING(APP_VERSION);
     json["build"] = APP_BUILD_NUMBER;
@@ -110,6 +111,7 @@ void WifiManager::setupCommonRoutes()
 
     if (jsonObj["brightness"].is<int>()) prefs->setBrightness(jsonObj["brightness"].as<int>());
     if (jsonObj["osdLevel"].is<int>()) prefs->setOsdLevel(jsonObj["osdLevel"].as<int>());
+    if (jsonObj["timerMinutes"].is<int>()) prefs->setTimerMinutes(jsonObj["timerMinutes"].as<int>());
 
     request->send(200, "application/json", "{\"status\":\"ok\"}");
 

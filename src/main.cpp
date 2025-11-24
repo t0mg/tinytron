@@ -26,8 +26,23 @@ Display display(&prefs);
 Button button(SYS_OUT, SYS_EN);
 AsyncWebServer server(80);
 Battery battery(BATTERY_VOLTAGE_PIN, 3.3, 200000.0, 100000.0);
+unsigned long shutdown_time = 0;
 WifiManager wifiManager(&server, &prefs, &battery);
 bool wifiManagerActive = false;
+
+void setShutdownTime(int minutes)
+{
+  if (minutes > 0)
+  {
+    shutdown_time = millis() + minutes * 60 * 1000;
+    Serial.printf("Timer set, shutting down in %d minutes\n", minutes);
+  }
+  else
+  {
+    shutdown_time = 0;
+    Serial.println("Timer disabled");
+  }
+}
 
 void setup()
 {
@@ -39,6 +54,9 @@ void setup()
   prefs.begin();
   prefs.onBrightnessChanged([](int brightness)
                             { display.setBrightness(brightness); });
+  prefs.onTimerMinutesChanged([](int minutes)
+                              { setShutdownTime(minutes); });
+  setShutdownTime(prefs.getTimerMinutes());
   display.setBrightness(prefs.getBrightness());
   display.drawOSD("Tinytron", CENTER, STANDARD);
   display.drawOSD(TOSTRING(APP_VERSION) " " TOSTRING(APP_BUILD_NUMBER), BOTTOM_RIGHT, DEBUG);
@@ -109,6 +127,18 @@ void loop()
   delay(5);
 
   unsigned long now = millis();
+  if (shutdown_time > 0 && now > shutdown_time)
+  {
+    if (videoPlayer != nullptr)
+    {
+      videoPlayer->stop();
+    }
+    display.fillScreen(TFT_BLACK);
+    display.drawOSD("Going to sleep\nGood bye!", CENTER, STANDARD);
+    display.flushSprite();
+    delay(5000);
+    button.powerOff();
+  }
   if (now - lastBatteryUpdate > 10000)
   {
     battery.update();
