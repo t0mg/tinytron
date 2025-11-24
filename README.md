@@ -62,7 +62,7 @@ The case was only tested with Prusa MK4S and PLA. It prints with 0.28mm layers i
 
 ## 🪛 Assembly instructions
 
-Assembly only takes a few minutes. You'll need a drop of plastic glue or cyanoacrylate glue, a bit of elecrical tape, a soldering iron and flush cutter pliers.
+Assembly only takes a few minutes. You'll need a drop of plastic glue or cyanoacrylate glue, a bit of electrical tape, a soldering iron and flush cutter pliers.
 
 ### 1. Solder the header
 
@@ -106,7 +106,7 @@ Then wrap a bit of electrical tape around the male pins in order to create a mak
 
 ### 3. Glue the bezel
 
-The first step is to glue the bezel on the front piece. If you aren't confident that you can one shot the align,ent, use a piece of painter tape as a hinge to align the two pices, then open it, add some cyanoacrylate or plastic glue, and snap it back in pace.
+The first step is to glue the bezel on the front piece. If you aren't confident that you can one shot the alignment, use a piece of painter tape as a hinge to align the two pieces, then open it, add some cyanoacrylate or plastic glue, and snap it back in place.
 
 ### 4. Assemble the device
 
@@ -249,6 +249,7 @@ The web interface allows you to:
 ## 🫰 Credits and references
 - This project is relying heavily on [esp32-tv by atomic14](https://github.com/atomic14/esp32-tv) and the related [blog](http://www.atomic14.com) and [videos](https://www.youtube.com/atomic14). Many thanks !
 - Another great source was [moononournation's MiniTV](https://github.com/moononournation/MiniTV).
-- The [Waveshare wiki page](https://www.waveshare.com/wiki/ESP32-S3-LCD-1.69) and provideed examples were extremyly useful.
+- The [Waveshare wiki page](https://www.waveshare.com/wiki/ESP32-S3-LCD-1.69) and provided examples were extremely useful.
 - The web UI uses the VCR OSD Mono font by Riciery Leal.
 - Github pages hosted [transcoder tool](https://t0mg.github.io/tinytron/transcode.html) inspired by [this post](https://dannadori.medium.com/how-to-deploy-ffmpeg-wasm-application-to-github-pages-76d1ca143b17), uses [coi-serviceworker](https://github.com/gzuidhof/coi-serviceworker) to load [ffmpeg.wasm](https://github.com/ffmpegwasm/ffmpeg.wasm).
+- This project also relies on the following open source libraries: [ArduinoJson](https://github.com/bblanchon/ArduinoJson), [TFT_eSPI](https://github.com/Bodmer/TFT_eSPI), [JPEGDEC](https://github.com/bitbank2/JPEGDEC), [ESPAsyncWebServer](https://github.com/ESP32Async/ESPAsyncWebServer), and [marked](https://github.com/markedjs/marked).
