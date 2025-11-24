@@ -11,6 +11,7 @@ public:
   void reset();
   bool isClicked();
   bool isDoubleClicked();
+  void powerOff();
 
 private:
   int _pin;

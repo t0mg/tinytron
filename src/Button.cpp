@@ -104,3 +104,8 @@ bool Button::isDoubleClicked()
 {
   return doubleClickDetected;
 }
+
+void Button::powerOff()
+{
+  digitalWrite(_sys_en_pin, LOW);
+}
