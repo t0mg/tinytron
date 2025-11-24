@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
             '-q:v',
             '10',
             '-vf',
-            'scale=-1:240:flags=lanczos,crop=288:240:(in_w-288)/2:0',
+            'scale=-1:240:flags=lanczos,crop=288:240:(in_w-288)/2:0,fps=min(25, original_fps)',
             'out.avi'
         ];
 

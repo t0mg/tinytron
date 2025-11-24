@@ -65,7 +65,7 @@ jobs:
           npm run md-to-html
 
           # 5. Copy STL files and images
-          cp -r ../stl dist/stl
+          cp -r ../assets dist/assets
 
           # 6. Manually copy the ffmpeg-wasm core files from node_modules/
           mkdir -p dist/ffmpeg

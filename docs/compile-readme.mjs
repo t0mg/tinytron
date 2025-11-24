@@ -4,13 +4,15 @@ import fs from 'fs';
 import path from 'path';
 
 // Define paths
-const inputPath = path.resolve(process.cwd(), '..', 'README.md'); // Points to root README.md
+const rootDir = path.resolve(process.cwd(), '..');
+const docsDir = process.cwd();
+const inputPath = path.resolve(rootDir, 'README.md'); // Points to root README.md
 // Create dist folder if necessary
-if (!fs.existsSync(path.resolve(process.cwd(), 'dist'))) {
-    fs.mkdirSync(path.resolve(process.cwd(), 'dist'));
+if (!fs.existsSync(path.resolve(docsDir, 'dist'))) {
+    fs.mkdirSync(path.resolve(docsDir, 'dist'));
 }
-const outputPath = path.resolve(process.cwd(), 'dist', 'index.html');
-const templatePath = path.resolve(process.cwd(), 'readme-template.html');
+const outputPath = path.resolve(docsDir, 'dist', 'index.html');
+const templatePath = path.resolve(docsDir, 'readme-template.html');
 
 // Add anchor links to headings, like on GitHub
 const renderer = {
@@ -29,8 +31,12 @@ const renderer = {
 marked.use({ renderer });
 
 try {
-    // 1. Read the Markdown content
+    // Read the Markdown content
     let markdown = fs.readFileSync(inputPath, 'utf8');
+
+    // Remove "mdOnly" content
+    const mdOnlyRegex = /<p class="mdOnly">.*?<\/p>/g;
+    markdown = markdown.replace(mdOnlyRegex, '');
 
     // Replace YouTube URLs with video embeds
     const youtubeRegex = /^(https?:\/\/(?:www\.)?youtube\.com\/watch\?v=([\w-]+).*)$/gm;
@@ -44,7 +50,7 @@ try {
             allowfullscreen></iframe></div>`;
     });
 
-    // 2. Generate TOC from headings
+    // Generate TOC from headings
     const tocHeadings = marked.lexer(markdown).filter(token => token.type === 'heading' && (token.depth === 2 || token.depth === 3));
     const tocTree = [];
     let currentH2 = null;
@@ -82,17 +88,17 @@ try {
     const tocHtml = buildTocHtml(tocTree);
     
     
-    // 3. Convert to HTML
+    // Convert to HTML
     const htmlContent = marked(markdown);
 
-    // 4. Read the HTML template (for styling and structure)
+    // Read the HTML template (for styling and structure)
     let template = fs.readFileSync(templatePath, 'utf8');
 
-    // 5. Insert the generated TOC and HTML into the template
+    // Insert the generated TOC and HTML into the template
     let finalHtml = template.replace('{toc}', tocHtml);
     finalHtml = finalHtml.replace('{content}', htmlContent);
 
-    // 6. Write the final HTML file to the dist folder
+    // Write the final HTML file to the dist folder
     fs.writeFileSync(outputPath, finalHtml);
 
     console.log(`Successfully compiled ${inputPath} to ${outputPath}`);

@@ -1,14 +1,14 @@
+<p class="mdOnly">
 # Tinytron 📺
+</p>
 
-⚠️ Work in progress ⚠️
+## 📋 Overview
 
-## Overview
-
-This project is a tiny video player designed specifically for the [ESP32-S3-LCD-1.69 from Waveshare](https://www.waveshare.com/wiki/ESP32-S3-LCD-1.69). 
+This project is (yet another) an ESP32 powered video player with 1.69 inch display designed specifically around the [ESP32-S3-LCD-1.69 from Waveshare](https://www.waveshare.com/wiki/ESP32-S3-LCD-1.69). 
 
 It can play MJPEG AVI files from an SD card, or stream video content from a computer over WiFi. It features a simple web interface for configuration and can be controlled with a single physical button.
 
-### Easy weekend project
+### Project goals
 
 Tinytron was designed to be straightforward to make:
 
@@ -46,10 +46,12 @@ One of this project's goals is to keep the BOM as short as possible. Only 3 part
 
 The case is made of 4 parts: front, back, bezel and button. Glue is required to fix the bezel on the front part, the rest of the assembly snap fits (with pretty tight tolerances) and requires no tools. 
 
-![Assembled parts](stl/cad.png)
-![Exploded case](stl/exploded.png)
+![Assembled parts](assets/cad.png)
+![Exploded case](assets/exploded.png)
 
 #### Printing instructions
+
+<a href="assets/Tinytron.zip" download>Download the STL files</a>
 
 The case was only tested with Prusa MK4S and PLA. It prints with 0.28mm layers in about 30 minutes and 16 grams of material. I tried my best to limit the need for supports but paint-on supports are recommended in select spots for best results.
 
@@ -60,11 +62,11 @@ The case was only tested with Prusa MK4S and PLA. It prints with 0.28mm layers i
 | Bezel | Flat side | None |
 | Button | Top side | None |
 
-## Assembly instructions
+## 🪛 Assembly instructions
 
 Assembly only takes a few minutes. You'll need a drop of plastic glue or cyanoacrylate glue, a bit of elecrical tape, a soldering iron and flush cutter pliers.
 
-### 1. Solder the header on the SD card breakout board
+### 1. Solder the header
 
 Solder the 6 pin header to the SD breakout board. Trim the pins underneath.
 
@@ -176,9 +178,75 @@ You'll need a FAT32 formatted SD Card, and properly encoded video files (AVI MJP
 
 You can use [this web page](https://t0mg.github.io/tinytron/transcode.html) to convert video files in the expected format (max. output size 2Gb). It relies on [ffmpeg.wasm](https://github.com/ffmpegwasm/ffmpeg.wasm) for purely local, browser based conversion.
 
-For much faster conversion, the `ffmpeg` command line tool is recommended. 
+For much faster conversion, the `ffmpeg` command line tool is recommended. This is what the web version does:
 
-*TODO: add detailed command line*
+```sh
+ffmpeg -y -i input.mp4 -an -c:v mjpeg -q:v 10 \
+-vf "scale=-1:240:flags=lanczos,crop=288:240:(in_w-288)/2:0,fps=min(25, original_fps)" \
+out.avi
+```
+
+In case you arent ffmpeg fluent, here's a breakdown of what this does:
+
+| Option/Parameter | Purpose | 
+| -- | -- | 
+| `-y` | Overwrite output without prompt. |
+| `-i input.mp4` | Input file (use your own file name here). |
+| `-an` | No Audio. Discard the audio stream, we don't need it. |
+| `-c:v mjpeg` | Video codec: Motion JPEG (MJPEG). |
+| `-q:v 10` | High Quality (Quantizer 10), ranges [1-31], lower value is higher quality. |
+| `-vf "..."` | Video Filter Chain: |
+| `scale=-1:240:flags=lanczos` | Scale to 240px height, auto-width, using Lanczos algorithm. |
+| `crop=288:240:(in_w-288)/2:0` | Crop to 288x240, horizontally centered. It's 8 pixels wider than the display, but the JPEG decoding library performs faster with multiples of 16. |
+| `fps=min(25, original_fps)` | Set max FPS to 25, preserving original if lower. |
+| `out.avi` | Output file name and container. | 
+
+## 📖 Usage
+
+### Powering
+
+Long press the button (1 second) then release it to turn the Tinytron on and off.
+
+### SD Card Mode
+
+If a FAT32 formatted SD card containing `.avi` files is detected at boot, the device will automatically start playing them in alphabetical order. You can use the button to control the playback:
+
+- **Single Press:** Play/Pause the video.
+- **Double Press:** Play the next video file on the SD card.
+
+In SD Card mode, WiFi is disabled to save battery.
+
+### WiFi Mode
+
+If no SD card is detected, the device enters WiFi mode. It will attempt to connect to the previously configured WiFi network.
+
+- The IP address of the device will be displayed on the screen.
+- You can connect to this IP address from a web browser on the same network to access the [web interface](#web-interface).
+
+### Access Point (AP) Mode
+
+If the device fails to connect to a previously configured WiFi network (or if no network is configured), it will start in Access Point (AP) mode.
+
+- The device will create a WiFi network with the SSID `Tinytron`.
+- This network is open and does not require a password.
+- Connect to this network from your computer or phone, and you should be presented with a captive portal that opens the web interface. If not, open a browser and navigate to `192.168.4.1`.
+- From the web interface, you can configure the device to connect to your local WiFi network by specifying its SSID and password. Upon saving, the device will reboot and attempt to connect. You'll then need to connect to your home network to use [Wifi Mode](#wifi-mode). If it fails to connect, it'll return to AP mode after a few seconds.
+
+### Web Interface
+
+The web interface allows you to:
+
+- Configure WiFi settings.
+- Adjust screen brightness and On-Screen Display (OSD) level.
+- View battery status.
+- Stream local video files from your computer to the device.
+- Perform [Over-the-Air (OTA) firmware updates](#over-the-air-updates).
+
+### Battery & charging
+
+- Power consumption varies depending on usage (WiFi, brightness). In medium brightness and SD mode it can last several hours. The battery state is visible in the Web interface, as wekk as on the display if enabled in settings.
+- When the battery is low, a warning appears both in the Web interface and on the display.
+- The device charges over USB C. It currently cannot be turned off while charging.
 
 ## 🫰 Credits and references
 - This project is relying heavily on [esp32-tv by atomic14](https://github.com/atomic14/esp32-tv) and the related [blog](http://www.atomic14.com) and [videos](https://www.youtube.com/atomic14). Many thanks !
