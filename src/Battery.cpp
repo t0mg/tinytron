@@ -3,10 +3,8 @@
 
 // Voltage (mV) to Percentage mapping
 const int voltage_map[][2] = {
-    {4200, 100}, {4150, 95}, {4100, 90}, {4050, 85}, {4000, 80},
-    {3950, 75}, {3900, 70}, {3850, 65}, {3800, 60}, {3750, 55},
-    {3700, 50}, {3600, 40}, {3500, 30}, {3400, 20}, {3300, 15},
-    {3200, 10}, {3100, 5},  {3050, 2},  {3000, 0}
+    {3780, 100}, {3600, 80}, {3400, 60}, {3200, 40}, {3000, 20},
+    {2800, 10},  {2600, 5},  {2550, 1}
 };
 
 Battery::Battery(int pin, float vRef, float r1, float r2)
@@ -26,11 +24,12 @@ void Battery::update() {
     _voltage = voltage * ((_r1 + _r2) / _r2);
 
     // Battery level calculation
+    const int num_voltage_map_entries = sizeof(voltage_map) / sizeof(voltage_map[0]);
     int millivolts = _voltage * 1000;
     if (millivolts >= voltage_map[0][0]) {
         _battery_level = 100;
-    } else if (millivolts <= voltage_map[18][0]) {
-        _battery_level = 0;
+    } else if (millivolts <= voltage_map[num_voltage_map_entries - 1][0]) {
+        _battery_level = 1;
     } else {
         int i = 0;
         while (millivolts < voltage_map[i][0]) {
