@@ -23,17 +23,23 @@ public:
   OSDLevel getOsdLevel();
   void setOsdLevel(int level);
 
+  int getTimerMinutes();
+  void setTimerMinutes(int minutes);
+
   void onBrightnessChanged(std::function<void(int)> callback);
+  void onTimerMinutesChanged(std::function<void(int)> callback);
 
 private:
   Preferences preferences;
   std::function<void(int)> brightness_changed_callback;
+  std::function<void(int)> timer_minutes_changed_callback;
 
   static const char *PREF_NAMESPACE;
   static const char *PREF_SSID;
   static const char *PREF_PASS;
   static const char *PREF_BRIGHTNESS;
   static const char *PREF_OSD_LEVEL;
+  static const char *PREF_TIMER_MINUTES;
 
   String readStringPreference(const char *key, const String &defaultValue = "");
   void writeStringPreference(const char *key, const String &value);
