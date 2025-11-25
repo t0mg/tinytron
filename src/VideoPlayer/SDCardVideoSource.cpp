@@ -126,7 +126,7 @@ bool SDCardVideoSource::getVideoFrame(uint8_t **buffer, size_t &bufferLength, si
     return true;
 }
 
-const char *SDCardVideoSource::getChannelName()
+std::string SDCardVideoSource::getChannelName()
 {
     if (mChannelNumber >= 0 && mChannelNumber < mAviFiles.size())
     {
@@ -135,9 +135,9 @@ const char *SDCardVideoSource::getChannelName()
         size_t lastSlash = fullPath.find_last_of('/');
         if (lastSlash != std::string::npos)
         {
-            return fullPath.substr(lastSlash + 1).c_str();
+            return fullPath.substr(lastSlash + 1);
         }
-        return fullPath.c_str();
+        return fullPath;
     }
     return "Unknown";
 }

@@ -39,6 +39,6 @@ class VideoSource {
     virtual void nextChannel()=0;
     virtual int getChannelCount() = 0;
     virtual int getChannelNumber() { return mChannelNumber; }
-    virtual const char *getChannelName() = 0;
+    virtual std::string getChannelName() = 0;
     virtual bool fetchChannelData() = 0;
 };

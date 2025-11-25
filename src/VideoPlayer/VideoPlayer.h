@@ -15,7 +15,7 @@ class VideoSource;
 
 struct TimedOsd
 {
-  String text;
+  std::string text;
   OSDPosition position;
   OSDLevel level;
   uint32_t endTime;
@@ -63,7 +63,7 @@ class VideoPlayer {
     void pause();
     void playStatic();
     void playPauseToggle();
-    void drawOSDTimed(const char *text, OSDPosition position, OSDLevel level, uint32_t durationMs = 2000);
+    void drawOSDTimed(const std::string& text, OSDPosition position, OSDLevel level, uint32_t durationMs = 2000);
     void redrawFrame();
     VideoPlayerState getState() { return mState; }
 };

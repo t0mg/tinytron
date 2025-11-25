@@ -28,7 +28,7 @@ public:
     {
         return mAviFiles.size();
     };
-    const char *getChannelName();
+    std::string getChannelName();
     // AVIParser *getAudioParser()
     // {
     //     return mCurrentChannelAudioParser;

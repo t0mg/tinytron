@@ -43,7 +43,7 @@ class StreamVideoSource: public VideoSource {
     void nextChannel();
     int getChannelCount();
     int getChannelNumber();
-    const char *getChannelName() { return "Video stream"; }
+    std::string getChannelName() { return "Video stream"; }
     StreamState getStreamState()
     {
         return mStreamState;
