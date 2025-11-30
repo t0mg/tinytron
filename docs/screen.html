@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Tinytron Screen Share</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#128250;</text></svg>">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div class="container">
+    <h1>Tinytron Screen Share</h1>
+    <div id="connectionControls">
+      <label for="deviceIp">Device IP Address</label>
+      <input type="text" id="deviceIp" placeholder="e.g., 192.168.1.100">
+      <button id="connectButton">Connect</button>
+    </div>
+
+    <div id="streamingControls" style="display: none;">
+      <button id="startScreenButton" disabled>Start Screen Share</button>
+      <button id="stopScreenButton" style="display:none">Stop Screen Share</button>
+
+      <label for="jpegQuality">JPEG Quality</label>
+      <input type="range" id="jpegQuality" min="0.1" max="1.0" step="0.05" value="0.5">
+      <label for="scalingMode">Scaling</label>
+      <select id="scalingMode">
+        <option value="letterbox">Letterbox</option>
+        <option value="crop">Crop</option>
+        <option value="stretch">Stretch</option>
+      </select>
+
+      <div class="preview">
+        <video id="screenVideo" style="display: none;" muted></video>
+        <div class="stats">
+          <span>FPS: <span id="fpsDisplay">-</span></span><br>
+          <span>Frame Size: <span id="frameSizeDisplay">-</span> bytes</span><br>
+        </div>
+        <img id="previewImage" alt="JPEG Preview">
+      </div>
+    </div>
+    <footer><a href="https://t0mg.github.io/tinytron">Tinytron</a></footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+
+</html>

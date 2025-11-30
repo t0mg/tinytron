@@ -30,7 +30,24 @@ const renderer = {
 };
 marked.use({ renderer });
 
+// Helper function to copy files
+function copyFile(source, destination) {
+    try {
+        fs.copyFileSync(source, destination);
+        console.log(`Copied ${source} to ${destination}`);
+    } catch (error) {
+        console.error(`Error copying ${source}:`, error);
+        process.exit(1);
+    }
+}
+
 try {
+    // Copy shared assets
+    copyFile(path.resolve(rootDir, 'src', 'www', 'app.js'), path.resolve(docsDir, 'dist', 'app.js'));
+    copyFile(path.resolve(docsDir, 'style.css'), path.resolve(docsDir, 'dist', 'style.css'));
+    copyFile(path.resolve(rootDir, 'src', 'www', 'vcr.ttf'), path.resolve(docsDir, 'dist', 'vcr.ttf'));
+    copyFile(path.resolve(docsDir, 'screen.html'), path.resolve(docsDir, 'dist', 'screen.html'));
+
     // Read the Markdown content
     let markdown = fs.readFileSync(inputPath, 'utf8');
 
