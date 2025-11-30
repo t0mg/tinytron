@@ -97,6 +97,7 @@
       width: 100%;
       padding: 14px 16px;
       border-bottom: 2px solid var(--main-color);
+      box-sizing: border-box;
     }
 
     .tabs>label:hover {
@@ -126,6 +127,24 @@
 
     .tabs input[type="radio"]:checked+label+.tabcontent {
       display: block;
+    }
+
+    #streamSourceSelector {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    #streamSourceSelector label {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    fieldset {
+      border: none;
+      padding: 0;
+      margin: 0;
     }
 
     #splashscreen {
@@ -263,7 +282,7 @@
       }
 
       .tabs>label {
-        width: calc(33.33% - 32px);
+        width: 33.33%;
       }
     }
   </style>
@@ -280,31 +299,46 @@
     <div class="lowBatt" style="display: none;">Battery Low</div>
     <div class="tabs" style="display: none;">
       <input type="radio" name="tabs" id="tab-streaming" checked>
-      <label for="tab-streaming" id="streamingTabLabel">Video Streaming</label>
+      <label for="tab-streaming" id="streamingTabLabel">Streaming</label>
       <div class="tabcontent">
-        <div>
+        <div id="streamSourceSelector">
+          <label><input type="radio" name="streamSource" value="file" checked> File</label>
+          <label id="screenShareLabel"><input type="radio" name="streamSource" value="screen"> Screen</label>
+        </div>
+
+        <div id="screenShareWarning" style="display: none;">
+          Screen sharing is only available over a secure (HTTPS) connection.
+        </div>
+
+        <fieldset id="fileStreamControls">
           <label for="videoFile">Select a video file to stream</label>
           <input type="file" id="videoFile" accept="video/*">
           <button id="startButton" disabled>Start Streaming</button>
           <button id="stopButton" style="display:none">Stop Streaming</button>
+        </fieldset>
 
-          <label for="jpegQuality">JPEG Quality</label>
-          <input type="range" id="jpegQuality" min="0.1" max="1.0" step="0.05" value="0.5">
-          <label for="scalingMode">Scaling</label>
-          <select id="scalingMode">
-            <option value="letterbox">Letterbox</option>
-            <option value="crop">Crop</option>
-            <option value="stretch">Stretch</option>
-          </select>
+        <fieldset id="screenStreamControls" style="display: none;">
+          <button id="startScreenButton" disabled>Start Screen Share</button>
+          <button id="stopScreenButton" style="display:none">Stop Screen Share</button>
+        </fieldset>
 
-          <div class="preview">
-            <video id="video" controls loop muted></video>
-            <div class="stats">
-              <span>FPS: <span id="fpsDisplay">-</span></span><br>
-              <span>Frame Size: <span id="frameSizeDisplay">-</span> bytes</span><br>
-            </div>
-            <img id="previewImage" alt="JPEG Preview">
+        <label for="jpegQuality">JPEG Quality</label>
+        <input type="range" id="jpegQuality" min="0.1" max="1.0" step="0.05" value="0.5">
+        <label for="scalingMode">Scaling</label>
+        <select id="scalingMode">
+          <option value="letterbox">Letterbox</option>
+          <option value="crop">Crop</option>
+          <option value="stretch">Stretch</option>
+        </select>
+
+        <div class="preview">
+          <video id="video" style="display: none;" muted></video>
+          <video id="screenVideo" style="display: none;" muted></video>
+          <div class="stats">
+            <span>FPS: <span id="fpsDisplay">-</span></span><br>
+            <span>Frame Size: <span id="frameSizeDisplay">-</span> bytes</span><br>
           </div>
+          <img id="previewImage" alt="JPEG Preview">
         </div>
       </div>
 
