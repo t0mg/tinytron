@@ -7,7 +7,7 @@ class Streamer {
     this.frameSizeUpdateCallback = frameSizeUpdateCallback || function() {};
 
     this.scalingMode = 'letterbox';
-    this.jpegQuality = 80;
+    this.jpegQuality = 0.5;
 
     this.ws = null;
     this.videoFrameId = null;
@@ -18,7 +18,7 @@ class Streamer {
     this.sendFrame = this.sendFrame.bind(this);
   }
 
-  connectWebSocket(host, onOpen) {
+  connectWebSocket(host, onOpen, onError) {
     if (!host) {
       host = window.location.host;
     }
@@ -39,7 +39,10 @@ class Streamer {
         console.log("WebSocket connection closed, retrying...");
         setTimeout(() => this.connectWebSocket(host, onOpen), 1000);
       };
-      this.ws.onerror = (error) => console.error("WebSocket error:", error);
+      this.ws.onerror = (error) => {
+        console.error("WebSocket error:", error);
+        onError && onError(error);
+      }
     } catch (e) {
       console.warn("WebSocket connection failed.", e);
     }

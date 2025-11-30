@@ -37,9 +37,14 @@ startButton.onclick = async () => {
       }
     );
 
+    // Set scaling mode and JPEG quality
+    streamer.scalingMode = 'crop';
+    streamer.jpegQuality = 0.5;
+
     streamer.connectWebSocket(deviceIp, () => {
-      // 3. Start streaming once WebSocket is connected
       streamer.start();
+    }, (error) => {
+      alert("WebSocket connection failed. Please verify you have enabled insecure connection in the browser flags and that the device IP is correct.");
     });
 
     stopButton.style.display = '';
@@ -48,7 +53,7 @@ startButton.onclick = async () => {
   } catch (error) {
     console.error("Error starting screen capture:", error);
     alert("Could not start screen capture. Please ensure you grant permission.");
- 
+
     stopButton.style.display = 'none';
     startButton.style.display = '';
     deviceIpInput.disabled = false;
@@ -65,7 +70,7 @@ stopButton.onclick = () => {
     video.srcObject.getTracks().forEach(track => track.stop());
     video.srcObject = null;
   }
-  
+
   stopButton.style.display = 'none';
   startButton.style.display = '';
   deviceIpInput.disabled = false;

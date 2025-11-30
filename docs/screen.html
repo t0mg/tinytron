@@ -9,12 +9,14 @@
   <link rel="stylesheet" href="https://fonts.xz.style/serve/inter.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@exampledev/new.css@1.1.2/new.min.css">
   <style>
-    video, #previewImage {
+    video,
+    #previewImage {
       width: 100%;
       max-width: 288px;
       height: 240px;
       border: 1px solid #ccc;
     }
+
     .grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -27,7 +29,18 @@
   <a href="index.html">&larr; Back to Tinytron project</a>
   <h1>Tinytron screen streamer 📺</h1>
 
-  <p>This tool is part of the <a href="index.html">Tinytron project</a> and allows you to stream your screen directly to the device.</p>
+  <p>This tool is part of the <a href="index.html">Tinytron project</a> and allows you to stream your screen directly to
+    the device.</p>
+
+  <p>You will need to enable the following flag in Chrome to allow insecure WebSocket connections:
+
+    <code>chrome://flags/#unsafely-treat-insecure-origin-as-secure</code>
+
+    <a href="chrome://flags/#unsafely-treat-insecure-origin-as-secure">Open Chrome flags</a> and add the IP address of
+    the device, prefixed with <code>ws://</code>, e.g. <code>ws://192.168.1.123</code>. After enabling the flag, restart
+    Chrome and come back to this page.
+  </p>
+
   <p>You will need to enter the IP address of your device below. This page cannot auto-detect it.</p>
 
   <fieldset>
