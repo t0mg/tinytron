@@ -97,6 +97,7 @@
       width: 100%;
       padding: 14px 16px;
       border-bottom: 2px solid var(--main-color);
+      box-sizing: border-box;
     }
 
     .tabs>label:hover {
@@ -263,7 +264,7 @@
       }
 
       .tabs>label {
-        width: calc(33.33% - 32px);
+        width: 25%;
       }
     }
   </style>
@@ -279,8 +280,25 @@
     <h1>Tinytron</h1>
     <div class="lowBatt" style="display: none;">Battery Low</div>
     <div class="tabs" style="display: none;">
-      <input type="radio" name="tabs" id="tab-streaming" checked>
-      <label for="tab-streaming" id="streamingTabLabel">Video Streaming</label>
+      <input type="radio" name="tabs" id="tab-screen-streaming" checked>
+      <label for="tab-screen-streaming" id="screenStreamingTabLabel">Screen Stream</label>
+      <div class="tabcontent">
+        <div>
+          <button id="startScreenButton" disabled>Start Screen Share</button>
+          <button id="stopScreenButton" style="display:none">Stop Screen Share</button>
+
+          <div class="preview">
+            <video id="screenVideo" style="display: none;"></video>
+            <div class="stats">
+              <span>FPS: <span id="screenFpsDisplay">-</span></span><br>
+              <span>Frame Size: <span id="screenFrameSizeDisplay">-</span> bytes</span><br>
+            </div>
+            <img id="screenPreviewImage" alt="JPEG Preview">
+          </div>
+        </div>
+      </div>
+      <input type="radio" name="tabs" id="tab-streaming">
+      <label for="tab-streaming" id="streamingTabLabel">File Streaming</label>
       <div class="tabcontent">
         <div>
           <label for="videoFile">Select a video file to stream</label>

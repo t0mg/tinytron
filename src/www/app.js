@@ -4,6 +4,12 @@ const video = document.getElementById('video');
 const startButton = document.getElementById('startButton');
 const stopButton = document.getElementById('stopButton');
 const previewImage = document.getElementById('previewImage');
+const startScreenButton = document.getElementById('startScreenButton');
+const stopScreenButton = document.getElementById('stopScreenButton');
+const screenVideo = document.getElementById('screenVideo');
+const screenPreviewImage = document.getElementById('screenPreviewImage');
+const screenFpsDisplay = document.getElementById('screenFpsDisplay');
+const screenFrameSizeDisplay = document.getElementById('screenFrameSizeDisplay');
 const batteryVoltageDisplay = document.getElementById('batteryVoltageDisplay');
 const jpegQualitySlider = document.getElementById('jpegQuality');
 const scalingModeSelect = document.getElementById('scalingMode');
@@ -27,11 +33,33 @@ const firmwareVersion = document.getElementById('firmwareVersion');
 const firmwareBuild = document.getElementById('firmwareBuild');
 
 let ws;
-let videoFrameId;
-let fpsInterval;
-let lastFrameTime;
-let frameTimeBuffer;
 let apMode = false;
+let activeStreamType = null;
+
+const streamState = {
+  file: {
+    videoEl: video,
+    fpsDisplayEl: fpsDisplay,
+    frameSizeDisplayEl: frameSizeDisplay,
+    previewImageEl: previewImage,
+    startButtonEl: startButton,
+    stopButtonEl: stopButton,
+    fpsInterval: null,
+    lastFrameTime: null,
+    frameTimeBuffer: [],
+  },
+  screen: {
+    videoEl: screenVideo,
+    fpsDisplayEl: screenFpsDisplay,
+    frameSizeDisplayEl: screenFrameSizeDisplay,
+    previewImageEl: screenPreviewImage,
+    startButtonEl: startScreenButton,
+    stopButtonEl: stopScreenButton,
+    fpsInterval: null,
+    lastFrameTime: null,
+    frameTimeBuffer: [],
+  }
+};
 
 // Fetch all settings from the server
 async function fetchSettings() {
@@ -167,15 +195,19 @@ function connectWebSocket() {
     ws.onopen = () => {
       console.log("WebSocket connection established");
       startButton.disabled = false;
+      startScreenButton.disabled = false;
     };
     ws.onmessage = (event) => {
-      if (event.data === "ready") {
-        video.requestVideoFrameCallback(sendFrame);
+      if (event.data === 'ready' && activeStreamType) {
+        const state = streamState[activeStreamType];
+        state.videoEl.requestVideoFrameCallback(() => sendFrame(activeStreamType));
       }
     };
     ws.onclose = () => {
       console.log("WebSocket connection closed, retrying...");
       startButton.disabled = true;
+      stopButton.click();
+      stopScreenButton.click();
       setTimeout(connectWebSocket, 1000);
     };
     ws.onerror = (error) => console.error("WebSocket error:", error);
@@ -193,8 +225,9 @@ videoFile.addEventListener('change', () => {
   }
 });
 
-function sendFrame() {
-  if (video.paused || video.ended) {
+function sendFrame(streamType) {
+  const state = streamState[streamType];
+  if (state.videoEl.paused || state.videoEl.ended) {
     return;
   }
 
@@ -204,9 +237,10 @@ function sendFrame() {
   canvas.width = 288;
   canvas.height = 240;
   const context = canvas.getContext('2d');
-  const videoAspectRatio = video.videoWidth / video.videoHeight;
+
+  const videoAspectRatio = state.videoEl.videoWidth / state.videoEl.videoHeight;
   const canvasAspectRatio = canvas.width / canvas.height;
-  let sx = 0, sy = 0, sWidth = video.videoWidth, sHeight = video.videoHeight;
+  let sx = 0, sy = 0, sWidth = state.videoEl.videoWidth, sHeight = state.videoEl.videoHeight;
   let dx = 0, dy = 0, dWidth = canvas.width, dHeight = canvas.height;
 
   if (scalingMode === 'letterbox') {
@@ -219,34 +253,35 @@ function sendFrame() {
     }
     context.fillStyle = 'black';
     context.fillRect(0, 0, canvas.width, canvas.height);
-    context.drawImage(video, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
+    context.drawImage(state.videoEl, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
   } else if (scalingMode === 'crop') {
     if (videoAspectRatio > canvasAspectRatio) {
-      sWidth = video.videoHeight * canvasAspectRatio;
-      sx = (video.videoWidth - sWidth) / 2;
+      sWidth = state.videoEl.videoHeight * canvasAspectRatio;
+      sx = (state.videoEl.videoWidth - sWidth) / 2;
     } else {
-      sHeight = video.videoWidth / canvasAspectRatio;
-      sy = (video.videoHeight - sHeight) / 2;
+      sHeight = state.videoEl.videoWidth / canvasAspectRatio;
+      sy = (state.videoEl.videoHeight - sHeight) / 2;
     }
-    context.drawImage(video, sx, sy, sWidth, sHeight, 0, 0, canvas.width, canvas.height);
+    context.drawImage(state.videoEl, sx, sy, sWidth, sHeight, 0, 0, canvas.width, canvas.height);
   } else { // stretch
-    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    context.drawImage(state.videoEl, 0, 0, canvas.width, canvas.height);
   }
+
 
   canvas.toBlob(blob => {
     if (blob) {
       const now = performance.now();
-      if (lastFrameTime) {
-        const frameTime = now - lastFrameTime;
+      if (state.lastFrameTime) {
+        const frameTime = now - state.lastFrameTime;
         if (frameTime > 0 && frameTime < 1000) {
-          frameTimeBuffer.push(frameTime);
+          state.frameTimeBuffer.push(frameTime);
         }
       }
-      lastFrameTime = now;
-      frameSizeDisplay.textContent = blob.size;
+      state.lastFrameTime = now;
+      state.frameSizeDisplayEl.textContent = blob.size;
       const imageUrl = URL.createObjectURL(blob);
-      previewImage.src = imageUrl;
-      previewImage.onload = () => URL.revokeObjectURL(imageUrl);
+      state.previewImageEl.src = imageUrl;
+      state.previewImageEl.onload = () => URL.revokeObjectURL(imageUrl);
       if (ws && ws.readyState === WebSocket.OPEN) {
         ws.send(blob);
       }
@@ -259,43 +294,83 @@ startButton.onclick = () => {
     alert("Please select a video file first.");
     return;
   }
+  startStreaming('file');
+};
+
+stopButton.onclick = () => stopStreaming('file');
+
+function startStreaming(streamType) {
+  const state = streamState[streamType];
   if (!ws || ws.readyState !== WebSocket.OPEN) {
     alert("WebSocket is not connected. Please wait.");
     return;
   }
-  lastFrameTime = performance.now();
-  frameTimeBuffer = [];
-  fpsInterval = setInterval(() => {
-    if (frameTimeBuffer && frameTimeBuffer.length > 0) {
-      const avgInterval = frameTimeBuffer.reduce((a, b) => a + b) / frameTimeBuffer.length;
+  activeStreamType = streamType;
+  for (const type in streamState) {
+    streamState[type].startButtonEl.disabled = true;
+  }
+  state.lastFrameTime = performance.now();
+  state.frameTimeBuffer = [];
+  state.fpsInterval = setInterval(() => {
+    if (state.frameTimeBuffer.length > 0) {
+      const avgInterval = state.frameTimeBuffer.reduce((a, b) => a + b) / state.frameTimeBuffer.length;
       const currentFps = 1000 / avgInterval;
-      fpsDisplay.textContent = currentFps.toFixed(1);
-      frameTimeBuffer = [];
+      state.fpsDisplayEl.textContent = currentFps.toFixed(1);
+      state.frameTimeBuffer = [];
     } else {
-      fpsDisplay.textContent = '0.0';
+      state.fpsDisplayEl.textContent = '0.0';
     }
   }, 1000);
-  video.play();
+  state.videoEl.play();
   ws.send("START");
-  stopButton.style.display = '';
-  startButton.style.display = 'none';
-};
+  state.stopButtonEl.style.display = '';
+  state.startButtonEl.style.display = 'none';
+}
 
-stopButton.onclick = () => {
-  if (videoFrameId) {
-    video.cancelVideoFrameCallback(videoFrameId);
-    videoFrameId = null;
+function stopStreaming(streamType) {
+  const state = streamState[streamType];
+  activeStreamType = null;
+  for (const type in streamState) {
+    streamState[type].startButtonEl.disabled = false;
   }
-  video.pause();
+  state.videoEl.pause();
+  if (streamType === 'screen' && state.videoEl.srcObject) {
+    state.videoEl.srcObject.getTracks().forEach(track => track.stop());
+    state.videoEl.srcObject = null;
+  }
   if (ws && ws.readyState === WebSocket.OPEN) {
     ws.send("STOP");
   }
-  clearInterval(fpsInterval);
-  fpsDisplay.textContent = '-';
-  frameSizeDisplay.textContent = '-';
-  stopButton.style.display = 'none';
-  startButton.style.display = '';
+  clearInterval(state.fpsInterval);
+  state.fpsDisplayEl.textContent = '-';
+  state.frameSizeDisplayEl.textContent = '-';
+  state.stopButtonEl.style.display = 'none';
+  state.startButtonEl.style.display = '';
+}
+
+startScreenButton.onclick = async () => {
+  if (!ws || ws.readyState !== WebSocket.OPEN) {
+    alert("WebSocket is not connected. Please wait.");
+    return;
+  }
+  try {
+    screenVideo.srcObject = await navigator.mediaDevices.getDisplayMedia({
+      video: {
+        width: 288,
+        height: 240,
+        frameRate: 15
+      },
+      audio: false
+    });
+    screenVideo.onloadedmetadata = () => {
+      startStreaming('screen');
+    };
+  } catch (err) {
+    console.error("Error: " + err);
+  }
 };
+
+stopScreenButton.onclick = () => stopStreaming('screen');
 
 scalingModeSelect.onchange = (e) => {
   const mode = e.target.value;
@@ -341,4 +416,4 @@ window.onload = async () => {
   }
   document.querySelector('.tabs').style.display = 'flex';
   splashscreen.style.display = 'none';
-}
+};
