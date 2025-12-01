@@ -241,16 +241,17 @@ The web interface allows you to:
 - Adjust screen brightness and On-Screen Display (OSD) level.
 - Set an auto-shutdown timer.
 - View battery status.
-- Stream local video files, or mirror your screen from your computer to the device (read details below).
+- Stream local video files.
+- Stream a screen or window from your computer ([read details about mirorring](#screen-mirorring)).
 - Perform [Over-the-Air (OTA) firmware updates](#over-the-air-updates).
 
-<p class="flex"><img src="assets/streaming.png" title="Streaming tab, Screen Mirroring mode (CHARGE by Blender Studio, CC BY 4.0)"><img src="assets/settings.png" style="max-height:320px" title="Settings tab"></p>
+<p class="flex full"><img src="assets/streaming.png" title="Streaming tab, Screen Mirroring mode (CHARGE by Blender Studio, CC BY 4.0)"><img src="assets/settings.png" title="Settings tab"></p>
 
 #### Screen mirorring
 
 Because the ESP32 on the Tinytron is only capable of insecure connections, and screen mirroring requires https, your browser will (rightfully) block this streaming mode.
 
-There's a workaround, but it comes with a caveats: for this mode to work, you will need to enable the *Insecure origins treated as secure* flag in your desktop Chrome browser to allow your browser to access screen sharing and to stream it via an insecure and WebSocket connection to your Tinytron. Note that this does not work on mobile.
+There's a workaround, but it comes with a big caveat: for this mode to work, you will need to enable the *Insecure origins treated as secure* flag in your desktop Chrome browser to allow your browser to access screen sharing and to stream it via an insecure and WebSocket connection to your Tinytron. Note that this does not work on mobile.
 
 **⚠️ Warning:** This browser flag is a security risk, and should only be enabled on a trusted network. **If you don't understand what this means, or are uncomfortable with doing it, please do not proceed further.** There are several other ways to play videos on Tinytron!
 
