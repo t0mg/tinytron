@@ -267,7 +267,7 @@ There's a workaround, but it comes with a big caveat: for this mode to work, you
 
 ### Battery & charging
 
-- Power consumption varies depending on usage (WiFi, brightness). In medium brightness and SD mode it can last several hours. The battery state is visible in the Web interface, as wekk as on the display if enabled in settings.
+- Power consumption varies depending on usage (WiFi, brightness). In medium brightness and SD mode it can last several hours. The battery state is visible in the Web interface, as well as on the display if enabled in settings.
 - When the battery is low, a warning appears both in the Web interface and on the display.
 - The device charges over USB C. It currently cannot be turned off while charging.
 
