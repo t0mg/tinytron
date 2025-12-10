@@ -358,17 +358,11 @@
             <option value="2">Debug</option>
           </select>
 
-          <label>Board Revision</label>
-          <div style="display: flex; gap: 20px; align-items: center; margin-bottom: 5px;">
-            <div style="display: flex; align-items: center;">
-              <input type="radio" id="boardRev1" name="boardRevision" value="1" style="width: auto; margin-right: 5px;">
-              <label for="boardRev1" style="padding: 0; margin: 0; display: inline;">V1</label>
-            </div>
-            <div style="display: flex; align-items: center;">
-              <input type="radio" id="boardRev2" name="boardRevision" value="2" style="width: auto; margin-right: 5px;">
-              <label for="boardRev2" style="padding: 0; margin: 0; display: inline;">V2</label>
-            </div>
-          </div>
+          <label for="boardRevision">Board Revision</label>
+          <select id="boardRevision" name="boardRevision">
+            <option value="1">V1</option>
+            <option value="2">V2 (Default)</option>
+          </select>
 
           <label for="timerMinutes">Auto-shutdown timer (minutes)</label>
           <input type="range" id="timerMinutes" min="0" max="60" step="5" value="0">
