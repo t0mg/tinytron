@@ -1,12 +1,11 @@
 #pragma once
 
-enum class AVIChunkType
-{
-  VIDEO, AUDIO
-};
+#include <stdio.h>
+#include <string>
 
-class AVIParser
-{
+enum class AVIChunkType { VIDEO, AUDIO };
+
+class AVIParser {
 private:
   std::string mFileName;
   AVIChunkType mRequiredChunkType;
