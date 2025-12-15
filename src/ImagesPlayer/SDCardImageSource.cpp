@@ -8,11 +8,7 @@ SDCardImageSource::SDCardImageSource(SDCard *sdCard, const char *path,
                                      bool showFilename)
     : mSDCard(sdCard), mPath(path), mShowFilename(showFilename) {}
 
-void SDCardImageSource::start() {
-  // nothing to do
-}
-
-bool SDCardImageSource::fetchChannelData() {
+bool SDCardImageSource::fetchImageData() {
   if (!mSDCard->isMounted()) {
     Serial.println("SD card is not mounted");
     return false;
@@ -39,45 +35,45 @@ bool SDCardImageSource::fetchChannelData() {
     return false;
   }
 
-  mChannelNumber = 0;
+  mImageNumber = 0;
   mLastChangeTime = 0;
   mForceNext = true;
   return true;
 }
 
-void SDCardImageSource::setChannel(int channel) {
+void SDCardImageSource::setImage(int index) {
   if (mImageFiles.empty()) {
     return;
   }
 
-  if (channel < 0) {
-    channel = 0;
+  if (index < 0) {
+    index = 0;
   }
-  if (channel >= (int)mImageFiles.size()) {
-    channel = (int)mImageFiles.size() - 1;
+  if (index >= (int)mImageFiles.size()) {
+    index = (int)mImageFiles.size() - 1;
   }
 
-  mChannelNumber = channel;
+  mImageNumber = index;
   mLastChangeTime = millis();
   mForceNext = true;
 }
 
-void SDCardImageSource::nextChannel() {
+void SDCardImageSource::nextImage() {
   if (mImageFiles.empty()) {
     return;
   }
 
-  int channel = mChannelNumber + 1;
-  if (channel >= (int)mImageFiles.size()) {
-    channel = 0;
+  int index = mImageNumber + 1;
+  if (index >= (int)mImageFiles.size()) {
+    index = 0;
   }
 
-  setChannel(channel);
+  setImage(index);
 }
 
-std::string SDCardImageSource::getChannelName() {
-  if (mChannelNumber >= 0 && mChannelNumber < (int)mImageFiles.size()) {
-    std::string fullPath = mImageFiles[mChannelNumber];
+std::string SDCardImageSource::getImageName() {
+  if (mImageNumber >= 0 && mImageNumber < (int)mImageFiles.size()) {
+    std::string fullPath = mImageFiles[mImageNumber];
     size_t lastSlash = fullPath.find_last_of('/');
     if (lastSlash != std::string::npos) {
       return fullPath.substr(lastSlash + 1);
@@ -89,11 +85,11 @@ std::string SDCardImageSource::getChannelName() {
 
 bool SDCardImageSource::loadCurrentImage(uint8_t **buffer, size_t &bufferLength,
                                          size_t &frameLength) {
-  if (mChannelNumber < 0 || mChannelNumber >= (int)mImageFiles.size()) {
+  if (mImageNumber < 0 || mImageNumber >= (int)mImageFiles.size()) {
     return false;
   }
 
-  const std::string &filename = mImageFiles[mChannelNumber];
+  const std::string &filename = mImageFiles[mImageNumber];
   FILE *f = fopen(filename.c_str(), "rb");
   if (!f) {
     Serial.printf("Failed to open image file %s\n", filename.c_str());
@@ -125,20 +121,9 @@ bool SDCardImageSource::loadCurrentImage(uint8_t **buffer, size_t &bufferLength,
   return true;
 }
 
-bool SDCardImageSource::getVideoFrame(uint8_t **buffer, size_t &bufferLength,
+bool SDCardImageSource::getImageFrame(uint8_t **buffer, size_t &bufferLength,
                                       size_t &frameLength) {
   if (mImageFiles.empty()) {
-    return false;
-  }
-
-  if (mState == VideoPlayerState::STOPPED ||
-      mState == VideoPlayerState::STATIC) {
-    vTaskDelay(50 / portTICK_PERIOD_MS);
-    return false;
-  }
-
-  if (mState == VideoPlayerState::PAUSED) {
-    vTaskDelay(50 / portTICK_PERIOD_MS);
     return false;
   }
 

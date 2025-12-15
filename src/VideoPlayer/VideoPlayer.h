@@ -24,7 +24,6 @@ class VideoPlayer {
 private:
   int mChannelVisible = 0;
   VideoPlayerState mState = VideoPlayerState::STOPPED;
-  uint32_t mLastStillAdvanceMs = 0;
 
   // video playing
   Display &mDisplay;

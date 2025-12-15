@@ -44,7 +44,4 @@ public:
   virtual int getChannelNumber() { return mChannelNumber; }
   virtual std::string getChannelName() = 0;
   virtual bool fetchChannelData() = 0;
-  virtual bool isStillImageSource() { return false; }
-  virtual bool showChannelNameOSD() { return true; }
-  virtual uint32_t getAutoAdvanceIntervalMs() { return 0; }
 };

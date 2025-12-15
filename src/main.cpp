@@ -1,6 +1,7 @@
 #include "Battery.h"
 #include "Button.h"
 #include "Display.h"
+#include "ImagesPlayer/ImagePlayer.h"
 #include "ImagesPlayer/SDCardImageSource.h"
 #include "Prefs.h"
 #include "SDCard.h"
@@ -22,6 +23,8 @@
 
 VideoSource *videoSource = NULL;
 VideoPlayer *videoPlayer = NULL;
+ImageSource *imageSource = NULL;
+ImagePlayer *imagePlayer = NULL;
 Prefs prefs;
 Display display(&prefs);
 Button button(SYS_OUT, SYS_EN);
@@ -91,27 +94,40 @@ void setup() {
     display.drawOSD("SD Card found !", CENTER, STANDARD);
     display.flushSprite();
 
-    VideoSource *candidate = new SDCardVideoSource(card, "/");
-    if (!candidate->fetchChannelData()) {
-      delete candidate;
-      candidate = new SDCardImageSource(card, "/", false);
-      // If images also fail, the retry loop below will keep trying.
+    VideoSource *videoCandidate = new SDCardVideoSource(card, "/");
+    if (videoCandidate->fetchChannelData()) {
+      videoSource = videoCandidate;
+    } else {
+      delete videoCandidate;
+      ImageSource *imageCandidate = new SDCardImageSource(card, "/", false);
+      if (imageCandidate->fetchImageData()) {
+        imageSource = imageCandidate;
+      } else {
+        delete imageCandidate;
+      }
     }
-    videoSource = candidate;
   }
 
   if (videoSource != nullptr) {
     videoPlayer = new VideoPlayer(videoSource, display, prefs, battery);
     videoPlayer->start();
-    // get the channel info
     while (!videoSource->fetchChannelData()) {
       Serial.println("Failed to fetch channel data");
       delay(1000);
     }
-    // default to first channel
     videoPlayer->setChannel(0);
     delay(500);
     videoPlayer->play();
+  } else if (imageSource != nullptr) {
+    imagePlayer = new ImagePlayer(imageSource, display, prefs, battery);
+    imagePlayer->start();
+    while (!imageSource->fetchImageData()) {
+      Serial.println("Failed to fetch image data");
+      delay(1000);
+    }
+    imagePlayer->setImage(0);
+    delay(500);
+    imagePlayer->play();
   }
   // reset the button state
   button.reset();
@@ -126,6 +142,9 @@ void loop() {
   if (shutdown_time > 0 && now > shutdown_time) {
     if (videoPlayer != nullptr) {
       videoPlayer->stop();
+    }
+    if (imagePlayer != nullptr) {
+      imagePlayer->stop();
     }
     display.fillScreen(TFT_BLACK);
     display.drawOSD("Time out!", CENTER, STANDARD);
@@ -148,6 +167,9 @@ void loop() {
       if (videoPlayer != nullptr) {
         videoPlayer->playPauseToggle();
       }
+      if (imagePlayer != nullptr) {
+        imagePlayer->playPauseToggle();
+      }
     }
 
     if (button.isDoubleClicked()) {
@@ -156,6 +178,9 @@ void loop() {
         // videoPlayer->playStatic();
         // delay(500);
         videoPlayer->nextChannel();
+      }
+      if (imagePlayer != nullptr) {
+        imagePlayer->nextImage();
       }
     }
   }

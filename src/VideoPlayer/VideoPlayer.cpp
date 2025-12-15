@@ -13,25 +13,7 @@ void VideoPlayer::_framePlayerTask(void *param) {
 VideoPlayer::VideoPlayer(VideoSource *videoSource, Display &display,
                          Prefs &prefs, Battery &battery)
     : mVideoSource(videoSource), mDisplay(display), mPrefs(prefs),
-      mBattery(battery), mState(VideoPlayerState::STOPPED) {
-  mLastStillAdvanceMs = millis();
-}
-
-static void fadeBacklight(Display &display, int fromBrightness,
-                          int toBrightness, int steps, int delayMs) {
-  if (steps <= 0) {
-    display.setBrightness(toBrightness);
-    return;
-  }
-  for (int i = 0; i <= steps; i++) {
-    int v = fromBrightness + ((toBrightness - fromBrightness) * i) / steps;
-    display.setBrightness((uint8_t)constrain(v, 0, 255));
-    vTaskDelay(delayMs / portTICK_PERIOD_MS);
-  }
-}
-
-static const int kFadeSteps = 50;
-static const int kFadeDelayMs = 20;
+      mBattery(battery), mState(VideoPlayerState::STOPPED) {}
 
 void VideoPlayer::start() { mVideoSource->start(); }
 
@@ -43,15 +25,6 @@ void VideoPlayer::playTask() {
 }
 
 void VideoPlayer::setChannel(int channel) {
-  bool isStill = mVideoSource && mVideoSource->isStillImageSource();
-  if (isStill) {
-    // For still images, keep the frame task running. The task will detect the
-    // channel change and perform the transition exactly once.
-    mVideoSource->setChannel(channel);
-    mLastStillAdvanceMs = millis();
-    return;
-  }
-
   m_runTask = false;
   // wait for the task to stop
   while (_framePlayerTaskHandle != NULL) {
@@ -59,25 +32,13 @@ void VideoPlayer::setChannel(int channel) {
   }
   // update the video source
   mVideoSource->setChannel(channel);
-  if (mVideoSource->showChannelNameOSD()) {
-    drawOSDTimed(mVideoSource->getChannelName(), TOP_LEFT, OSDLevel::STANDARD);
-  }
+  drawOSDTimed(mVideoSource->getChannelName(), TOP_LEFT, OSDLevel::STANDARD);
   playTask();
 }
 
 void VideoPlayer::nextChannel() {
-  bool isStill = mVideoSource && mVideoSource->isStillImageSource();
-
   if (mState == VideoPlayerState::PAUSED) {
     play();
-  }
-
-  if (isStill) {
-    // For still images, don't stop/restart the frame task. Avoids conflicting
-    // transitions with the slideshow timer.
-    mVideoSource->nextChannel();
-    mLastStillAdvanceMs = millis();
-    return;
   }
 
   m_runTask = false;
@@ -86,9 +47,7 @@ void VideoPlayer::nextChannel() {
     vTaskDelay(10);
   }
   mVideoSource->nextChannel();
-  if (mVideoSource->showChannelNameOSD()) {
-    drawOSDTimed(mVideoSource->getChannelName(), TOP_LEFT, OSDLevel::STANDARD);
-  }
+  drawOSDTimed(mVideoSource->getChannelName(), TOP_LEFT, OSDLevel::STANDARD);
   playTask();
 }
 
@@ -198,23 +157,10 @@ void VideoPlayer::framePlayerTask() {
   uint8_t *jpegBuffer = NULL;
   size_t jpegBufferLength = 0;
   size_t jpegLength = 0;
-  int lastRenderedChannel = -1;
   // used for calculating frame rate
   std::list<int> frameTimes;
   OSDLevel osdLevel = mPrefs.getOsdLevel();
   while (m_runTask) {
-    bool isStill = mVideoSource && mVideoSource->isStillImageSource();
-    if (isStill && mState == VideoPlayerState::PLAYING) {
-      uint32_t intervalMs = mVideoSource->getAutoAdvanceIntervalMs();
-      if (intervalMs > 0) {
-        uint32_t now = millis();
-        if ((uint32_t)(now - mLastStillAdvanceMs) >= intervalMs) {
-          mVideoSource->nextChannel();
-          mLastStillAdvanceMs = now;
-        }
-      }
-    }
-
     // handle timed OSDs
     bool needsRedraw = false;
     for (auto it = _timedOsds.begin(); it != _timedOsds.end();) {
@@ -271,15 +217,6 @@ void VideoPlayer::framePlayerTask() {
       vTaskDelay(10 / portTICK_PERIOD_MS);
       continue;
     }
-
-    bool doFade = mVideoSource && mVideoSource->isStillImageSource();
-    int currentChannel = mVideoSource ? mVideoSource->getChannelNumber() : -1;
-    bool channelChanged = doFade && lastRenderedChannel != -1 &&
-                          currentChannel != lastRenderedChannel;
-    int targetBrightness = mPrefs.getBrightness();
-    if (channelChanged) {
-      fadeBacklight(mDisplay, targetBrightness, 0, kFadeSteps, kFadeDelayMs);
-    }
     // store the current frame for redraw
     if (_currentFrame == NULL || jpegLength > _currentFrameSize) {
       if (_currentFrame) {
@@ -306,11 +243,6 @@ void VideoPlayer::framePlayerTask() {
       mJpeg.decode(0, 0, 0);
       mJpeg.close();
     }
-    if (doFade && currentChannel != lastRenderedChannel &&
-        mVideoSource->showChannelNameOSD()) {
-      drawOSDTimed(mVideoSource->getChannelName(), TOP_LEFT,
-                   OSDLevel::STANDARD);
-    }
     if (osdLevel >= OSDLevel::DEBUG) {
       char fpsText[8];
       sprintf(fpsText, "%d FPS", frameTimes.size() / 5);
@@ -331,14 +263,6 @@ void VideoPlayer::framePlayerTask() {
       mDisplay.drawOSD(osd.text.c_str(), osd.position, osd.level);
     }
     mDisplay.flushSprite();
-
-    if (channelChanged) {
-      fadeBacklight(mDisplay, 0, targetBrightness, kFadeSteps, kFadeDelayMs);
-    }
-
-    if (doFade) {
-      lastRenderedChannel = currentChannel;
-    }
   }
   // clean up
   if (staticBuffer != NULL) {
