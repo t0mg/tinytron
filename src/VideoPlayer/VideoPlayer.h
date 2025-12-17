@@ -1,72 +1,28 @@
 #pragma once
-#include "JPEGDEC.h"
-#include <Arduino.h>
+#include "VideoSource.h"
+#include "MediaPlayer.h"
+#include <list>
 
-#include "StreamVideoSource.h"
-#include "VideoPlayerState.h"
-
-#include "Battery.h"
-#include "OSD.h"
-#include "Prefs.h"
-
-class Display;
-class Prefs;
-class VideoSource;
-
-struct TimedOsd
-{
-  std::string text;
-  OSDPosition position;
-  OSDLevel level;
-  uint32_t endTime;
-};
-
-class VideoPlayer
+class VideoPlayer : public MediaPlayer
 {
 private:
-  int mChannelVisible = 0;
-  VideoPlayerState mState = VideoPlayerState::STOPPED;
-
-  // video playing
-  Display &mDisplay;
-  JPEGDEC mJpeg;
-  Prefs &mPrefs;
-  Battery &mBattery;
-
-  // video source
   VideoSource *mVideoSource = NULL;
+  std::list<int> mFrameTimes;
 
-  TaskHandle_t _framePlayerTaskHandle = NULL;
-  volatile bool m_runTask = false;
-
-  static void _framePlayerTask(void *param);
-
-  void framePlayerTask();
-  void playTask();
-  void drawOSD(int fps);
-
-  // timed OSD
-  std::list<TimedOsd> _timedOsds;
-
-  // current frame data - for redraw
-  uint8_t *_currentFrame = NULL;
-  size_t _currentFrameSize = 0;
-
-  friend int _doDraw(JPEGDRAW *pDraw);
+protected:
+  virtual bool getFrame(uint8_t **buffer, size_t &bufferLength, size_t &frameLength) override;
+  virtual void onFrameDisplayed() override;
+  virtual void onStateChanged(MediaPlayerState oldState, MediaPlayerState newState) override;
+  virtual void onStatic() override;
 
 public:
   VideoPlayer(VideoSource *videoSource, Display &display, Prefs &prefs,
               Battery &battery);
-  void setChannel(int channelIndex);
-  void nextChannel();
-  void start();
-  void play();
-  void stop();
-  void pause();
+  virtual void set(int channelIndex) override;
   void playStatic();
-  void playPauseToggle();
-  void drawOSDTimed(const std::string &text, OSDPosition position,
-                    OSDLevel level, uint32_t durationMs = 2000);
   void redrawFrame();
-  VideoPlayerState getState() { return mState; }
+
+  virtual void next() override;
+
+  virtual void start() override;
 };

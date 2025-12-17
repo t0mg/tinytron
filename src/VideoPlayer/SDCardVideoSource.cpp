@@ -94,13 +94,13 @@ bool SDCardVideoSource::getVideoFrame(uint8_t **buffer, size_t &bufferLength,
   {
     return false;
   }
-  if (mState == VideoPlayerState::STOPPED ||
-      mState == VideoPlayerState::STATIC)
+  if (mState == MediaPlayerState::STOPPED ||
+      mState == MediaPlayerState::STATIC)
   {
     vTaskDelay(100 / portTICK_PERIOD_MS);
     return false;
   }
-  if (mState == VideoPlayerState::PAUSED)
+  if (mState == MediaPlayerState::PAUSED)
   {
     vTaskDelay(100 / portTICK_PERIOD_MS);
     return false;

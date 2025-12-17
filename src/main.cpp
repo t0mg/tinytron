@@ -22,9 +22,12 @@
 #define TOSTRING(x) STRINGIFY(x)
 
 VideoSource *videoSource = NULL;
-VideoPlayer *videoPlayer = NULL;
 ImageSource *imageSource = NULL;
-ImagePlayer *imagePlayer = NULL;
+
+MediaPlayer *videoPlayer = NULL;
+MediaPlayer *imagePlayer = NULL;
+MediaPlayer *currentPlayer = NULL;
+
 Prefs prefs;
 Display display(&prefs);
 Button button(SYS_OUT, SYS_EN);
@@ -41,7 +44,6 @@ enum class PlaybackMode
   VIDEO_THEN_IMAGES
 };
 PlaybackMode playbackMode = PlaybackMode::VIDEO_ONLY;
-bool videoActive = false;
 
 void setShutdownTime(int minutes)
 {
@@ -144,9 +146,8 @@ void setup()
       Serial.println("Failed to fetch video data");
       delay(1000);
     }
-    videoPlayer->setChannel(0);
+    videoPlayer->set(0);
     delay(500);
-    videoPlayer->play();
   }
 
   if (imageSource != nullptr)
@@ -158,29 +159,31 @@ void setup()
       Serial.println("Failed to fetch image data");
       delay(1000);
     }
-    imagePlayer->setImage(0);
+    imagePlayer->set(0);
     delay(500);
-    if (videoSource == nullptr)
-    {
-      imagePlayer->play();
-    }
   }
 
   if (videoSource != nullptr && imageSource != nullptr)
   {
     playbackMode = PlaybackMode::VIDEO_THEN_IMAGES;
-    videoActive = true;
+    currentPlayer = videoPlayer;
   }
   else if (videoSource != nullptr)
   {
     playbackMode = PlaybackMode::VIDEO_ONLY;
-    videoActive = true;
+    currentPlayer = videoPlayer;
   }
   else if (imageSource != nullptr)
   {
     playbackMode = PlaybackMode::IMAGE_ONLY;
-    videoActive = false;
+    currentPlayer = imagePlayer;
   }
+
+  if (currentPlayer)
+  {
+    currentPlayer->play();
+  }
+
   // reset the button state
   button.reset();
 }
@@ -224,82 +227,55 @@ void loop()
   {
     if (playbackMode == PlaybackMode::VIDEO_THEN_IMAGES)
     {
-      if (videoActive)
+      if (currentPlayer == videoPlayer)
       {
         SDCardVideoSource *sdVideoSource = (SDCardVideoSource *)videoSource;
         if (sdVideoSource != nullptr && sdVideoSource->consumeWrapped())
         {
-          if (videoPlayer != nullptr)
+          videoPlayer->stop();
+          currentPlayer = imagePlayer;
+          SDCardImageSource *sdImageSource = (SDCardImageSource *)imageSource;
+          if (sdImageSource != nullptr)
           {
-            videoPlayer->stop();
+            sdImageSource->consumeWrapped(); // Prevent bounce-back
+            imagePlayer->set(0);
           }
-          if (imagePlayer != nullptr)
-          {
-            SDCardImageSource *sdImageSource = (SDCardImageSource *)imageSource;
-            if (sdImageSource != nullptr)
-            {
-              // Prevent immediate bounce-back if image source still has a stale
-              // wrapped flag from a previous cycle.
-              sdImageSource->consumeWrapped();
-            }
-            imagePlayer->setImage(0);
-            delay(50);
-            imagePlayer->play();
-          }
-          videoActive = false;
+          delay(50);
+          currentPlayer->play();
         }
       }
-      else
+      else // currentPlayer == imagePlayer
       {
         SDCardImageSource *sdImageSource = (SDCardImageSource *)imageSource;
         if (sdImageSource != nullptr && sdImageSource->consumeWrapped())
         {
-          if (imagePlayer != nullptr)
+          imagePlayer->stop();
+          currentPlayer = videoPlayer;
+          SDCardVideoSource *sdVideoSource = (SDCardVideoSource *)videoSource;
+          if (sdVideoSource != nullptr)
           {
-            imagePlayer->stop();
+            sdVideoSource->consumeWrapped(); // Prevent bounce-back
+            videoPlayer->set(0);
           }
-          if (videoPlayer != nullptr)
-          {
-            SDCardVideoSource *sdVideoSource = (SDCardVideoSource *)videoSource;
-            if (sdVideoSource != nullptr)
-            {
-              // Prevent immediate bounce-back if video source still has a stale
-              // wrapped flag from a previous cycle.
-              sdVideoSource->consumeWrapped();
-            }
-            videoPlayer->setChannel(0);
-            delay(50);
-            videoPlayer->play();
-          }
-          videoActive = true;
+          delay(50);
+          currentPlayer->play();
         }
       }
     }
 
     if (button.isClicked())
     {
-      if (videoPlayer != nullptr)
+      if (currentPlayer != nullptr)
       {
-        videoPlayer->playPauseToggle();
-      }
-      if (imagePlayer != nullptr)
-      {
-        imagePlayer->playPauseToggle();
+        currentPlayer->playPauseToggle();
       }
     }
 
     if (button.isDoubleClicked())
     {
-      if (videoPlayer != nullptr)
+      if (currentPlayer != nullptr)
       {
-        // videoPlayer->stop();
-        // videoPlayer->playStatic();
-        // delay(500);
-        videoPlayer->nextChannel();
-      }
-      if (imagePlayer != nullptr)
-      {
-        imagePlayer->nextImage();
+        currentPlayer->next();
       }
     }
   }

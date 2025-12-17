@@ -28,7 +28,7 @@ There are plenty of great ESP32 TV projects around ([credits](#-credits-and-refe
 
 - Simple control using a single physical button (single press to pause/resume playback, double press to next video, long press to turn on/off).
 - Battery voltage monitoring.
-- Web-based control panel for device management (WiFi settings, video streaming, battery voltage and various stats).
+- Web-based control panel for device management (WiFi settings, video streaming, auto-shutdown timer, battery voltage and various stats).
 - Over-the-Air (OTA) firmware updates.
 - JPEG image files also supported (slideshow mode).
 

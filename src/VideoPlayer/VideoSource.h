@@ -1,13 +1,13 @@
 #pragma once
 
-#include "VideoPlayerState.h"
+#include "../MediaPlayer.h"
 #include <Arduino.h>
 #include <string>
 
 class VideoSource
 {
 protected:
-  VideoPlayerState mState = VideoPlayerState::STOPPED;
+  MediaPlayerState mState = MediaPlayerState::STOPPED;
   int mAudioTimeMs = 0;
   int mLastAudioTimeUpdateMs = 0;
   int mChannelNumber = 0;
@@ -26,18 +26,18 @@ public:
     mAudioTimeMs = audioTimeMs;
     mLastAudioTimeUpdateMs = millis();
   }
-  void setState(VideoPlayerState state)
+  void setState(MediaPlayerState state)
   {
     mState = state;
     switch (state)
     {
-    case VideoPlayerState::PLAYING:
+    case MediaPlayerState::PLAYING:
       mAudioTimeMs = 0;
       mLastAudioTimeUpdateMs = millis();
       break;
-    case VideoPlayerState::PAUSED:
+    case MediaPlayerState::PAUSED:
       break;
-    case VideoPlayerState::STOPPED:
+    case MediaPlayerState::STOPPED:
       mLastAudioTimeUpdateMs = 0;
       break;
     }
