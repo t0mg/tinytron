@@ -196,6 +196,7 @@ void MediaPlayer::task()
     // if we got a frame, or we need to redraw for OSD, then draw
     if (mCurrentFrame)
     {
+      mWaitForFirstFrame = false;
       if (mJpeg.openRAM(mCurrentFrame, mCurrentFrameSize, _doDraw))
       {
         mJpeg.setUserPointer(this);
@@ -207,7 +208,10 @@ void MediaPlayer::task()
     else
     {
       // clear the screen if no frame
-      mDisplay.fillSprite(DisplayColors::BLACK);
+      if (!mWaitForFirstFrame)
+      {
+        mDisplay.fillSprite(DisplayColors::BLACK);
+      }
     }
 
     onFrameDisplayed();

@@ -49,6 +49,8 @@ protected:
 
   SemaphoreHandle_t mMutex = NULL;
 
+  bool mWaitForFirstFrame = false;
+
   static void _task(void *param);
   void task();
   void startTask();
@@ -72,6 +74,8 @@ public:
   void playPauseToggle();
   virtual void next() {}
   virtual void set(int index) {}
+
+  void setWaitForFirstFrame(bool wait) { mWaitForFirstFrame = wait; }
 
   void drawOSDTimed(const std::string &text, OSDPosition position,
                     OSDLevel level, uint32_t durationMs = 2000);
