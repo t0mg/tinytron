@@ -82,7 +82,7 @@ bool ImagePlayer::getFrame(uint8_t **buffer, size_t &bufferLength, size_t &frame
 void ImagePlayer::onLoop()
 {
   // Auto-advance
-  uint32_t intervalMs = mImageSource->getAutoAdvanceIntervalMs();
+  uint32_t intervalMs = mPrefs.getSlideshowInterval() * 1000;
   if (intervalMs > 0)
   {
     uint32_t now = millis();

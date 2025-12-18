@@ -6,6 +6,7 @@ const char *Prefs::PREF_PASS = "pass";
 const char *Prefs::PREF_BRIGHTNESS = "brightness";
 const char *Prefs::PREF_OSD_LEVEL = "osd_level";
 const char *Prefs::PREF_TIMER_MINUTES = "timer_minutes";
+const char *Prefs::PREF_SLIDESHOW_INTERVAL_SECONDS = "slideshow_sec";
 
 Prefs::Prefs() {}
 
@@ -89,6 +90,26 @@ void Prefs::setTimerMinutes(int minutes)
 void Prefs::onTimerMinutesChanged(std::function<void(int)> callback)
 {
   timer_minutes_changed_callback = callback;
+}
+
+int Prefs::getSlideshowInterval()
+{
+  return readIntPreference(PREF_SLIDESHOW_INTERVAL_SECONDS, 5); // Default to 5
+}
+
+void Prefs::setSlideshowInterval(int seconds)
+{
+  int clamped_seconds = constrain(seconds, 1, 60);
+  writeIntPreference(PREF_SLIDESHOW_INTERVAL_SECONDS, clamped_seconds);
+  if (slideshow_interval_changed_callback)
+  {
+    slideshow_interval_changed_callback(clamped_seconds);
+  }
+}
+
+void Prefs::onSlideshowIntervalChanged(std::function<void(int)> callback)
+{
+  slideshow_interval_changed_callback = callback;
 }
 
 String Prefs::readStringPreference(const char *key, const String &defaultValue)

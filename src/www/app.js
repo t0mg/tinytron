@@ -16,6 +16,8 @@ const brightnessSlider = document.getElementById('brightness');
 const osdLevelSelect = document.getElementById('osdLevel');
 const timerMinutesSlider = document.getElementById('timerMinutes');
 const timerMinutesDisplay = document.getElementById('timerMinutesDisplay');
+const slideshowIntervalSlider = document.getElementById('slideshowInterval');
+const slideshowIntervalDisplay = document.getElementById('slideshowIntervalDisplay');
 const streamingTabLabel = document.getElementById('streamingTabLabel');
 const settingsTabRadio = document.getElementById('tab-settings');
 const splashscreen = document.getElementById('splashscreen');
@@ -50,7 +52,9 @@ async function fetchSettings() {
       brightnessSlider.value = settings.brightness;
       osdLevelSelect.value = settings.osdLevel;
       timerMinutesSlider.value = settings.timerMinutes;
+      slideshowIntervalSlider.value = settings.slideshowInterval;
       updateTimerDisplay(settings.timerMinutes);
+      updateSlideshowIntervalDisplay(settings.slideshowInterval);
       apMode = settings.apMode;
       if (settings.version) {
         firmwareVersion.textContent = settings.version;
@@ -72,7 +76,8 @@ settingsForm.addEventListener('submit', (event) => {
     pass: passInput.value,
     brightness: parseInt(brightnessSlider.value),
     osdLevel: parseInt(osdLevelSelect.value),
-    timerMinutes: parseInt(timerMinutesSlider.value)
+    timerMinutes: parseInt(timerMinutesSlider.value),
+    slideshowInterval: parseInt(slideshowIntervalSlider.value)
   };
 
   const networkUpdated = (settings.ssid !== lastSsid || settings.pass.length > 0);
@@ -291,6 +296,14 @@ function updateTimerDisplay(minutes) {
 
 timerMinutesSlider.addEventListener('input', (event) => {
   updateTimerDisplay(event.target.value);
+});
+
+function updateSlideshowIntervalDisplay(seconds) {
+  slideshowIntervalDisplay.textContent = `Change every ${seconds > 1 ? `${seconds} seconds` : `second`}`;
+}
+
+slideshowIntervalSlider.addEventListener('input', (event) => {
+  updateSlideshowIntervalDisplay(event.target.value);
 });
 
 // Initial setup
