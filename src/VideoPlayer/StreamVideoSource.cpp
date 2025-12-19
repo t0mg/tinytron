@@ -8,21 +8,24 @@ StreamVideoSource::StreamVideoSource(AsyncWebServer *server) : mServer(server)
 {
   mWebSocket = new AsyncWebSocket("/ws");
   mServer->addHandler(mWebSocket);
-  mWebSocket->onEvent([this](AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len) {
+  mWebSocket->onEvent([this](AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len)
+                      {
     mLastReadyTime = 0;
-    onWsEvent(server, client, type, arg, data, len);
-  });
+    onWsEvent(server, client, type, arg, data, len); });
 }
 
-void StreamVideoSource::start() {
+void StreamVideoSource::start()
+{
   // create a mutex to control access to the JPEG buffer
   mCurrentFrameMutex = xSemaphoreCreateMutex();
   streamingSemaphore = xSemaphoreCreateMutex();
   jpegQueue = xQueueCreate(10, sizeof(JpegData_t));
 }
 
-bool StreamVideoSource::getVideoFrame(uint8_t **buffer, size_t &bufferLength, size_t &frameLength) {
-  if (mStreamState != StreamState::STREAMING) {
+bool StreamVideoSource::getVideoFrame(uint8_t **buffer, size_t &bufferLength, size_t &frameLength)
+{
+  if (mStreamState != StreamState::STREAMING)
+  {
     return false;
   }
 
@@ -31,10 +34,12 @@ bool StreamVideoSource::getVideoFrame(uint8_t **buffer, size_t &bufferLength, si
   xSemaphoreTake(mCurrentFrameMutex, portMAX_DELAY);
   // if the frame is ready, copy it to the buffer
   JpegData_t receivedJpeg;
-  if (xQueueReceive(jpegQueue, &receivedJpeg, portMAX_DELAY) == pdPASS) {
+  if (xQueueReceive(jpegQueue, &receivedJpeg, portMAX_DELAY) == pdPASS)
+  {
     copiedFrame = true;
     // reallocate the image buffer if necessary
-    if (receivedJpeg.jpeg_len > bufferLength) {
+    if (receivedJpeg.jpeg_len > bufferLength)
+    {
       *buffer = (uint8_t *)realloc(*buffer, receivedJpeg.jpeg_len);
       bufferLength = receivedJpeg.jpeg_len;
     }
@@ -184,10 +189,12 @@ void StreamVideoSource::onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *
   }
 }
 
-void StreamVideoSource::setChannel(int channel) {
+void StreamVideoSource::setChannel(int channel)
+{
 }
 
-void StreamVideoSource::nextChannel() {
+void StreamVideoSource::nextChannel()
+{
 }
 
 int StreamVideoSource::getChannelCount()

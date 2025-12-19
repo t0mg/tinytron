@@ -140,6 +140,10 @@ void setup()
   if (videoSource != nullptr)
   {
     videoPlayer = new VideoPlayer(videoSource, display, prefs, battery);
+    if (wifiManagerActive && !wifiManager.isAPMode())
+    {
+      videoPlayer->setWaitForFirstFrame(true);
+    }
     videoPlayer->start();
     while (!videoSource->fetchVideoData())
     {

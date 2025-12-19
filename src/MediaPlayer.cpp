@@ -125,6 +125,8 @@ void MediaPlayer::playPauseToggle()
 void MediaPlayer::drawOSDTimed(const std::string &text, OSDPosition position,
                                OSDLevel level, uint32_t durationMs)
 {
+  if (text.empty())
+    return;
   mTimedOsds.push_back({text, position, level, millis() + durationMs});
   mDisplay.drawOSD(text.c_str(), position, level);
 }
@@ -196,6 +198,7 @@ void MediaPlayer::task()
     // if we got a frame, or we need to redraw for OSD, then draw
     if (mCurrentFrame)
     {
+      mWaitForFirstFrame = false;
       if (mJpeg.openRAM(mCurrentFrame, mCurrentFrameSize, _doDraw))
       {
         mJpeg.setUserPointer(this);
@@ -207,7 +210,10 @@ void MediaPlayer::task()
     else
     {
       // clear the screen if no frame
-      mDisplay.fillSprite(DisplayColors::BLACK);
+      if (!mWaitForFirstFrame)
+      {
+        mDisplay.fillSprite(DisplayColors::BLACK);
+      }
     }
 
     onFrameDisplayed();

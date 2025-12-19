@@ -3,9 +3,14 @@
 #include <stdio.h>
 #include <string>
 
-enum class AVIChunkType { VIDEO, AUDIO };
+enum class AVIChunkType
+{
+  VIDEO,
+  AUDIO
+};
 
-class AVIParser {
+class AVIParser
+{
 private:
   std::string mFileName;
   AVIChunkType mRequiredChunkType;
