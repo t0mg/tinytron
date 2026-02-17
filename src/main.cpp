@@ -10,6 +10,7 @@
 #include "VideoPlayer/StreamVideoSource.h"
 #include "VideoPlayer/VideoPlayer.h"
 #include "WifiManager.h"
+#include "StatusLED.h"
 #include <Arduino.h>
 #include <ESPAsyncWebServer.h>
 #include <Wire.h>
@@ -33,6 +34,7 @@ Display display(&prefs);
 Button button(SYS_OUT, SYS_EN);
 AsyncWebServer server(80);
 Battery battery(BATTERY_VOLTAGE_PIN, 3.3, 200000.0, 100000.0);
+StatusLED statusLED(STATUS_LED_PIN);
 unsigned long shutdown_time = 0;
 WifiManager wifiManager(&server, &prefs, &battery);
 bool wifiManagerActive = false;
@@ -61,6 +63,8 @@ void setShutdownTime(int minutes)
 
 void setup()
 {
+  statusLED.begin();
+  statusLED.fastBlink(100);
   display.fillScreen(TFT_BLACK);
   Serial.begin(115200);
   delay(500); // Wait for serial to initialize
@@ -95,6 +99,11 @@ void setup()
     display.flushSprite();
     Serial.println("Failed to mount SD Card. Initializing WifiManager.");
     wifiManager.begin();
+    if (wifiManager.isAPMode()) {
+      statusLED.breathe(2000);
+    } else {
+      statusLED.breathe(1000);
+    }
     wifiManagerActive = true;
     Serial.printf("Wifi Connected: %s\n",
                   wifiManager.getIpAddress().toString().c_str());
@@ -120,6 +129,7 @@ void setup()
     Serial.println("SD Card mounted successfully.");
     display.drawOSD("SD Card found !", CENTER, STANDARD);
     display.flushSprite();
+    statusLED.blink(500);
 
     VideoSource *videoCandidate = new SDCardVideoSource(card, "/");
     if (videoCandidate->fetchVideoData())
@@ -201,6 +211,7 @@ unsigned long lastBatteryUpdate = 0;
 
 void loop()
 {
+  statusLED.update();
   delay(5);
 
   unsigned long now = millis();
@@ -224,6 +235,16 @@ void loop()
   {
     battery.update();
     lastBatteryUpdate = now;
+  }
+
+  static MediaPlayerState lastState = MediaPlayerState::STOPPED;
+  if (currentPlayer && currentPlayer->getState() != lastState) {
+    lastState = currentPlayer->getState();
+    if (lastState == MediaPlayerState::PLAYING) {
+      statusLED.breathe(4000);
+    } else if (lastState == MediaPlayerState::PAUSED) {
+      statusLED.solid(64);
+    }
   }
 
   button.update();
